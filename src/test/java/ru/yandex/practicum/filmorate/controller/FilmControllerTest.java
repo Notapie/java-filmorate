@@ -114,63 +114,55 @@ class FilmControllerTest {
 
     @Test
     public void shouldExceptionIfNewFilmNameIsNullOrBlank() {
-        ValidationException e = assertThrows(ValidationException.class, () -> {
-            controller.create(
-                    Film.builder()
-                            .description("desc")
-                            .releaseDate(LocalDate.of(1999, 7, 2))
-                            .duration(21)
-                            .build()
-            );
-        });
+        ValidationException e = assertThrows(ValidationException.class, () -> controller.create(
+                Film.builder()
+                        .description("desc")
+                        .releaseDate(LocalDate.of(1999, 7, 2))
+                        .duration(21)
+                        .build()
+        ));
 
         assertEquals("film name must be not null or blank.", e.getMessage());
     }
 
     @Test
     public void shouldExceptionIfNewFilmDescSizeMoreThan200() {
-        ValidationException e = assertThrows(ValidationException.class, () -> {
-            controller.create(
-                    Film.builder()
-                            .name("film")
-                            .description("desc".repeat(51))
-                            .releaseDate(LocalDate.of(1999, 7, 2))
-                            .duration(21)
-                            .build()
-            );
-        });
+        ValidationException e = assertThrows(ValidationException.class, () -> controller.create(
+                Film.builder()
+                        .name("film")
+                        .description("desc".repeat(51))
+                        .releaseDate(LocalDate.of(1999, 7, 2))
+                        .duration(21)
+                        .build()
+        ));
 
         assertEquals("film desc must be less than 200.", e.getMessage());
     }
 
     @Test
     public void shouldExceptionIfNewFilmReleaseDateIsBefore1895() {
-        ValidationException e = assertThrows(ValidationException.class, () -> {
-            controller.create(
-                    Film.builder()
-                            .name("film")
-                            .description("desc")
-                            .releaseDate(LocalDate.of(1800, 7, 2))
-                            .duration(21)
-                            .build()
-            );
-        });
+        ValidationException e = assertThrows(ValidationException.class, () -> controller.create(
+                Film.builder()
+                        .name("film")
+                        .description("desc")
+                        .releaseDate(LocalDate.of(1800, 7, 2))
+                        .duration(21)
+                        .build()
+        ));
 
         assertEquals("Invalid film release date.", e.getMessage());
     }
 
     @Test
     public void shouldExceptionIfNewFilmDurationIsNegative() {
-        ValidationException e = assertThrows(ValidationException.class, () -> {
-            controller.create(
-                    Film.builder()
-                            .name("film")
-                            .description("desc")
-                            .releaseDate(LocalDate.of(1999, 7, 2))
-                            .duration(-23)
-                            .build()
-            );
-        });
+        ValidationException e = assertThrows(ValidationException.class, () -> controller.create(
+                Film.builder()
+                        .name("film")
+                        .description("desc")
+                        .releaseDate(LocalDate.of(1999, 7, 2))
+                        .duration(-23)
+                        .build()
+        ));
 
         assertEquals("Invalid film duration. Duration must be positive.", e.getMessage());
     }
