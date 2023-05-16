@@ -22,7 +22,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film AddFilm(@RequestBody Film film) {
+    public Film AddFilm(@RequestBody final Film film) {
         if (idToFilm.containsKey(film.getId())) {
             throw new FilmAlreadyExistsException("Film with id " + film.getId() + " already exists.");
         }
@@ -32,7 +32,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film UpdateFilm(@RequestBody Film film) {
+    public Film UpdateFilm(@RequestBody final Film film) {
         if (!idToFilm.containsKey(film.getId())) {
             throw new FilmNotFoundException("Film with id " + film.getId() + " is not found.");
         }
