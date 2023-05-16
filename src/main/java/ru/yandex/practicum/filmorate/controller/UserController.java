@@ -63,9 +63,14 @@ public class UserController {
     }
 
     private void validate(final User user) {
+        if (user.getLogin() == null || user.getLogin().isBlank()) {
+            throw new ValidationException("User login must be not null or blank.");
+        }
+
         if (user.getLogin().contains(" ")) {
             throw new ValidationException("Login cannot contain spaces.");
         }
+
         if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("The date of birth cannot be in the future.");
         }
