@@ -29,7 +29,7 @@ public class UserController {
         if (idToUser.containsKey(user.getId())) {
             throw new FilmAlreadyExistsException("User with id " + user.getId() + " already exists.");
         }
-        userValidate(user);
+        validate(user);
         idToUser.put(user.getId(), user);
         log.debug("Added new user: " + user);
         return user;
@@ -40,13 +40,13 @@ public class UserController {
         if (!idToUser.containsKey(user.getId())) {
             throw new FilmNotFoundException("User with id " + user.getId() + " is not found.");
         }
-        userValidate(user);
+        validate(user);
         final User prevFilm = idToUser.put(user.getId(), user);
         log.debug("Updated user: " + prevFilm + " -> " + user);
         return user;
     }
 
-    private void userValidate(final User user) {
+    private void validate(final User user) {
         if (user.getLogin().contains(" ")) {
             throw new ValidationException("Login cannot contain spaces.");
         }

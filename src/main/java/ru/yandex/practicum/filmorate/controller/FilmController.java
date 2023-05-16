@@ -4,9 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.FilmAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -40,5 +42,15 @@ public class FilmController {
         final Film prevFilm = idToFilm.put(film.getId(), film);
         log.debug("Updated film: " + prevFilm + " -> " + film);
         return film;
+    }
+
+    private void validate(final Film film) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            throw new ValidationException("Invalid film release date.");
+        }
+
+        if (film.getDuration().isNegative()) {
+            throw new ValidationException("Invalid film duration. Duration must be positive.");
+        }
     }
 }
