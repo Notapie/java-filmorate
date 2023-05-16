@@ -52,6 +52,14 @@ public class FilmController {
     }
 
     private void validate(final Film film) {
+        if (film.getName() == null || film.getName().isBlank()) {
+            throw new ValidationException("film name must be not null or blank.");
+        }
+
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
+            throw new ValidationException("film desc must be less than 200.");
+        }
+
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Invalid film release date.");
         }
