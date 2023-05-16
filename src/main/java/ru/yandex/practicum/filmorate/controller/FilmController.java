@@ -17,7 +17,7 @@ import java.util.TreeMap;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Integer, Film> idToFilm = new TreeMap<>();
-    int idGenerator = 0;
+    int idGenerator = 1;
 
     @GetMapping
     public Collection<Film> get() {
@@ -56,7 +56,7 @@ public class FilmController {
             throw new ValidationException("Invalid film release date.");
         }
 
-        if (film.getDuration().isNegative()) {
+        if (film.getDuration() < 0) {
             throw new ValidationException("Invalid film duration. Duration must be positive.");
         }
     }

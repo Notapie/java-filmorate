@@ -24,5 +24,5 @@ public class Film {
     LocalDate releaseDate;
 
     @NotNull
-    Duration duration;
+    Integer duration;
 }

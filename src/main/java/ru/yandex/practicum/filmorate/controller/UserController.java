@@ -17,7 +17,7 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
     private final Map<Integer, User> idToUser = new HashMap<>();
-    int idGenerator = 0;
+    int idGenerator = 1;
 
     @GetMapping
     public Collection<User> get() {
@@ -27,7 +27,12 @@ public class UserController {
     @PostMapping
     public User create(@Valid @RequestBody final User user) {
         validate(user);
-        final User newUser = user.toBuilder().id(idGenerator++).build();
+
+        final User.UserBuilder builder = user.toBuilder().id(idGenerator++);
+        if (user.getName() == null || user.getName().isBlank()) {
+            builder.name(user.getLogin());
+        }
+        final User newUser = builder.build();
 
         idToUser.put(newUser.getId(), newUser);
         log.debug("Added new user: " + newUser);
@@ -44,6 +49,12 @@ public class UserController {
             throw new FilmNotFoundException("User with id " + user.getId() + " is not found.");
         }
         validate(user);
+
+        final User.UserBuilder builder = user.toBuilder();
+        if (user.getName() == null || user.getName().isBlank()) {
+            builder.name(user.getLogin());
+        }
+        final User newUser = builder.build();
 
         final User prevFilm = idToUser.put(user.getId(), user);
         log.debug("Updated user: " + prevFilm + " -> " + user);
