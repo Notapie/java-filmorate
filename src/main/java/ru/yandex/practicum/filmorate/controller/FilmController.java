@@ -18,6 +18,7 @@ import java.util.TreeMap;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Integer, Film> idToFilm = new TreeMap<>();
+    int idGenerator = 0;
 
     @GetMapping
     public Collection<Film> get() {
@@ -26,21 +27,28 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody final Film film) {
-        if (idToFilm.containsKey(film.getId())) {
-            throw new FilmAlreadyExistsException("Film with id " + film.getId() + " already exists.");
-        }
-        idToFilm.put(film.getId(), film);
-        log.debug("Added new film: " + film);
-        return film;
+        validate(film);
+        final Film newFilm = film.toBuilder().id(idGenerator++).build();
+
+        idToFilm.put(newFilm.getId(), newFilm);
+        log.debug("Added new film: " + newFilm);
+
+        return newFilm;
     }
 
     @PutMapping
     public Film update(@RequestBody final Film film) {
+        if (film.getId() == null) {
+            throw new ValidationException("Film id must be not null.");
+        }
         if (!idToFilm.containsKey(film.getId())) {
             throw new FilmNotFoundException("Film with id " + film.getId() + " is not found.");
         }
+        validate(film);
+
         final Film prevFilm = idToFilm.put(film.getId(), film);
         log.debug("Updated film: " + prevFilm + " -> " + film);
+
         return film;
     }
 

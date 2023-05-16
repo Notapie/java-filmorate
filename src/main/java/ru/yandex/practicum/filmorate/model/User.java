@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Value
 @Builder(toBuilder = true)
 public class User {
-    int id;
+    Integer id;
 
     @NotBlank
     @Email
