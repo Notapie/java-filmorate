@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -63,7 +64,7 @@ public class UserController {
     }
 
     private void validate(final User user) {
-        if (user.getLogin() == null || user.getLogin().isBlank()) {
+        if (StringUtils.hasText(user.getLogin())) {
             throw new ValidationException("User login must be not null or blank.");
         }
 

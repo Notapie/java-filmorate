@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -52,7 +53,7 @@ public class FilmController {
     }
 
     private void validate(final Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
+        if (StringUtils.hasText(film.getName())) {
             throw new ValidationException("film name must be not null or blank.");
         }
 
