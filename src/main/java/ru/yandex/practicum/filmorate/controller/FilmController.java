@@ -53,7 +53,7 @@ public class FilmController {
     }
 
     private void validate(final Film film) {
-        if (StringUtils.hasText(film.getName())) {
+        if (!StringUtils.hasText(film.getName())) {
             throw new ValidationException("film name must be not null or blank.");
         }
 

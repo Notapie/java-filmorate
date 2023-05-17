@@ -64,7 +64,7 @@ public class UserController {
     }
 
     private void validate(final User user) {
-        if (StringUtils.hasText(user.getLogin())) {
+        if (!StringUtils.hasText(user.getLogin())) {
             throw new ValidationException("User login must be not null or blank.");
         }
 
