@@ -1,20 +1,50 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest(controllers = FilmController.class)
 class FilmControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private FilmController controller;
 
     @BeforeEach
     public void updateController() {
         controller = new FilmController();
+    }
+
+    @Test
+    public void webTest() throws Exception {
+        Film film = Film.builder()
+                .name("film")
+                .description("test film")
+                .releaseDate(LocalDate.of(1999, 7, 2))
+                .duration(200).build();
+
+        mockMvc.perform(post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(film))
+        ).andExpect(status().isOk()).andExpect(content().json(
+                objectMapper.writeValueAsString(film.toBuilder().id(1).build())
+        ));
     }
 
     @Test
