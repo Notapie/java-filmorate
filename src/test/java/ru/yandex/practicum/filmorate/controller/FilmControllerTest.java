@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
 
@@ -28,7 +29,7 @@ class FilmControllerTest {
 
     @BeforeEach
     public void updateController() {
-        controller = new FilmController();
+        controller = new FilmController(new FilmService());
     }
 
     @Test

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.time.LocalDate;
 
@@ -14,7 +15,7 @@ class UserControllerTest {
 
     @BeforeEach
     public void updateController() {
-        controller = new UserController();
+        controller = new UserController(new UserService());
     }
 
     @Test
