@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -20,8 +21,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User createUser(final User user) {
         if (idToUser.containsKey(user.getId())) {
-            //TODO: Переделать на кастомное исключение
-            throw new RuntimeException();
+            throw new AlreadyExistsException("User with id " + user.getId() + " already exists");
         }
 
         idToUser.put(user.getId(), user);

@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -43,7 +43,7 @@ public class UserService {
             throw new ValidationException("User id must be not null.");
         }
         if (!idToUser.containsKey(user.getId())) {
-            throw new FilmNotFoundException("User with id " + user.getId() + " is not found.");
+            throw new NotFoundException("User with id " + user.getId() + " is not found.");
         }
         validate(user);
 

@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -37,7 +37,7 @@ public class FilmService {
             throw new ValidationException("Film id must be not null.");
         }
         if (!idToFilm.containsKey(film.getId())) {
-            throw new FilmNotFoundException("Film with id " + film.getId() + " is not found.");
+            throw new NotFoundException("Film with id " + film.getId() + " is not found.");
         }
         validate(film);
 
