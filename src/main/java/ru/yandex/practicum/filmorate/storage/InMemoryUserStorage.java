@@ -109,7 +109,7 @@ public class InMemoryUserStorage implements UserStorage {
         final Set<Integer> secondUserFriends = idToFriendsIds.get(secondUserId);
 
         if (firstUserFriends != null) {
-            result = result || firstUserFriends.remove(secondUserId);
+            result = firstUserFriends.remove(secondUserId);
         }
         if (secondUserFriends != null) {
             result = result || secondUserFriends.remove(firstUserId);
