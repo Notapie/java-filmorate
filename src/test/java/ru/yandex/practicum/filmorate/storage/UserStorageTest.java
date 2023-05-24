@@ -32,5 +32,4 @@ abstract class UserStorageTest {
         user = user.toBuilder().id(1).build();
         assertEquals(user, storage.getUserById(1));
     }
-
 }
