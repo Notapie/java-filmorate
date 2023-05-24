@@ -9,6 +9,10 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
+    void linkAsFriends(int firstUserId, int secondUserId);
+
+    void unlinkFriends(int firstUserId, int secondUserId);
+
     void deleteFilm(Film film);
 
     Film getFilmById(int id);
