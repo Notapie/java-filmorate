@@ -11,8 +11,6 @@ public interface UserStorage {
 
     User removeUser(int id);
 
-    User removeUser(String email);
-
     User getUserByEmail(String email);
 
     User getUserById(int id);
