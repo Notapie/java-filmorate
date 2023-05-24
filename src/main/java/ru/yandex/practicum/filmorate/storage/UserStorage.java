@@ -9,6 +9,10 @@ public interface UserStorage {
 
     User updateUser(User user);
 
+    void linkAsFriends(int firstUserId, int secondUserId);
+
+    void unlinkFriends(int firstUserId, int secondUserId);
+
     User removeUser(int id);
 
     User getUserByEmail(String email);
