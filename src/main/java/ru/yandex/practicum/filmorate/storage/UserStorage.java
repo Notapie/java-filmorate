@@ -9,9 +9,9 @@ public interface UserStorage {
 
     User updateUser(User user);
 
-    void linkAsFriends(int firstUserId, int secondUserId);
+    boolean linkAsFriends(int firstUserId, int secondUserId);
 
-    void unlinkFriends(int firstUserId, int secondUserId);
+    boolean unlinkFriends(int firstUserId, int secondUserId);
 
     User removeUser(int id);
 

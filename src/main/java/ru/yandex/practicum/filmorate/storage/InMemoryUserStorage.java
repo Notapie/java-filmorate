@@ -12,7 +12,7 @@ public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> idToUser;
     private final Map<String, User> emailToUser;
     private final Map<String, User> loginToUser;
-    private final Map<Integer, HashSet<Integer>> idToFriendsIds;
+    private final Map<Integer, Set<Integer>> idToFriendsIds;
     int idGenerator;
 
     public InMemoryUserStorage() {
@@ -44,6 +44,7 @@ public class InMemoryUserStorage implements UserStorage {
         idToUser.put(newUser.getId(), newUser);
         emailToUser.put(newUser.getEmail(), newUser);
         loginToUser.put(newUser.getLogin(), newUser);
+        idToFriendsIds.put(newUser.getId(), new HashSet<>());
 
         return newUser;
     }
@@ -84,6 +85,40 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public boolean linkAsFriends(final int firstUserId, final int secondUserId) {
+        // check if users exists
+        final Set<Integer> firstUserFriends = idToFriendsIds.get(firstUserId);
+        final Set<Integer> secondUserFriends = idToFriendsIds.get(secondUserId);
+
+        if (firstUserFriends == null) {
+            throw new NotFoundException("User with id " + firstUserId + " not found");
+        }
+        if (secondUserFriends == null) {
+            throw new NotFoundException("User with id " + secondUserId + " not found");
+        }
+
+        // saving
+        return secondUserFriends.add(firstUserId) || firstUserFriends.add(secondUserId);
+    }
+
+    @Override
+    public boolean unlinkFriends(final int firstUserId, final int secondUserId) {
+        boolean result = false;
+
+        final Set<Integer> firstUserFriends = idToFriendsIds.get(firstUserId);
+        final Set<Integer> secondUserFriends = idToFriendsIds.get(secondUserId);
+
+        if (firstUserFriends != null) {
+            result = result || firstUserFriends.remove(secondUserId);
+        }
+        if (secondUserFriends != null) {
+            result = result || secondUserFriends.remove(firstUserId);
+        }
+
+        return result;
+    }
+
+    @Override
     public User removeUser(final int id) {
         final User user = idToUser.remove(id);
 
@@ -93,6 +128,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         emailToUser.remove(user.getEmail());
         loginToUser.remove(user.getLogin());
+        idToFriendsIds.remove(id);
         return user;
     }
 
