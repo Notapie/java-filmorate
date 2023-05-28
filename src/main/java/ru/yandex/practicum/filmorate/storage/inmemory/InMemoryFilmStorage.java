@@ -17,7 +17,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public InMemoryFilmStorage() {
         this.idToFilm = new HashMap<>();
-        this.orderedByLikesFilms = new TreeSet<>(new FilmByLikesComparator());
+        this.orderedByLikesFilms = new TreeSet<>(new FilmByLikesComparator().reversed());
         this.userIdToLikedFilmsIds = new HashMap<>();
         this.filmToUserLiked = new HashMap<>();
         this.idGenerator = 1;

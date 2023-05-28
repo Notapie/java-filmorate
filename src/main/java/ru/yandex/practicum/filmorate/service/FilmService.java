@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import java.util.Iterator;
 @AllArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     public Collection<Film> getAll() {
         return filmStorage.getAll();
@@ -33,6 +36,20 @@ public class FilmService {
         }
 
         return result;
+    }
+
+    public void addLike(final int userId, final int filmId) {
+        if (userStorage.getUserById(userId) == null) {
+            throw new NotFoundException("User with id " + userId + " not found");
+        }
+        filmStorage.addLike(userId, filmId);
+    }
+
+    public void removeLike(final int userId, final int filmId) {
+        if (userStorage.getUserById(userId) == null) {
+            throw new NotFoundException("User with id " + userId + " not found");
+        }
+        filmStorage.removeLike(userId, filmId);
     }
 
     public Film create(final Film film) {
