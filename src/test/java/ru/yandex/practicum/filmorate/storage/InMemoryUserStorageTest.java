@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import static org.junit.jupiter.api.Assertions.*;
+import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryUserStorage;
 
 class InMemoryUserStorageTest extends UserStorageTest {
     @Override
