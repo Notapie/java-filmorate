@@ -117,6 +117,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         return orderedByLikesFilms;
     }
 
+    @Override
+    public Collection<Film> getAll() {
+        return idToFilm.values();
+    }
+
     private static long getLikeIndex(final Film film, final int likesCount) {
         return ((long) likesCount) << 32 | film.getId();
     }

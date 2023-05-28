@@ -9,7 +9,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 @Slf4j
 @Service
@@ -18,7 +20,19 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     public Collection<Film> getAll() {
-        return filmStorage.getFilmsSortedByLikes();
+        return filmStorage.getAll();
+    }
+
+    public Collection<Film> getPopular(final int count) {
+        final Collection<Film> sortedFilms = filmStorage.getFilmsSortedByLikes();
+
+        final Collection<Film> result = new ArrayList<>();
+        Iterator<Film> it = sortedFilms.iterator();
+        for(int i = 0; i < count && it.hasNext(); i++) {
+            result.add(it.next());
+        }
+
+        return result;
     }
 
     public Film create(final Film film) {

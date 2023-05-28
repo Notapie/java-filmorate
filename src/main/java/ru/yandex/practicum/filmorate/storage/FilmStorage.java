@@ -18,4 +18,6 @@ public interface FilmStorage {
     Film getFilmById(int filmId);
 
     Collection<Film> getFilmsSortedByLikes();
+
+    Collection<Film> getAll();
 }

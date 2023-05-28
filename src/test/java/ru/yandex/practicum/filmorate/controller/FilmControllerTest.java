@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -29,7 +30,7 @@ class FilmControllerTest {
 
     @BeforeEach
     public void updateController() {
-        controller = new FilmController(new FilmService());
+        controller = new FilmController(new FilmService(new InMemoryFilmStorage()));
     }
 
     @Test
