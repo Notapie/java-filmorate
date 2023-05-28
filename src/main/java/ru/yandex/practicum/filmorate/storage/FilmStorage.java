@@ -9,6 +9,10 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
+    boolean addLike(int userId, int filmId);
+
+    boolean removeLike(int userId, int filmId);
+
     Film deleteFilm(int filmId);
 
     Film getFilmById(int filmId);

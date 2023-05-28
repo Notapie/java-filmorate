@@ -50,6 +50,46 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public boolean addLike(final int userId, final int filmId) {
+        Film film = idToFilm.get(filmId);
+
+        if (film == null) {
+            throw new NotFoundException("Film with id " + filmId + " not found");
+        }
+
+        Set<Integer> likedFilms = userIdToLikedFilmsIds.computeIfAbsent(userId, k -> new HashSet<>());
+
+        if (likedFilms.contains(filmId)) {
+            return false;
+        }
+
+        likedFilms.add(filmId);
+        film = film.toBuilder().likesCount(film.getLikesCount() + 1).build();
+        updateFilm(film);
+
+        return true;
+    }
+
+    @Override
+    public boolean removeLike(int userId, int filmId) {
+        final Set<Integer> likedFilms = userIdToLikedFilmsIds.get(userId);
+        if (likedFilms == null || !likedFilms.contains(filmId)) {
+            return false;
+        }
+
+        likedFilms.remove(filmId);
+
+        Film film = idToFilm.get(filmId);
+        if (film != null) {
+            final int newLikesCount = Integer.max(film.getLikesCount() - 1, 0);
+            film = film.toBuilder().likesCount(newLikesCount).build();
+            updateFilm(film);
+        }
+
+        return true;
+    }
+
+    @Override
     public Film deleteFilm(final int filmId) {
         final Film oldRecord = idToFilm.remove(filmId);
 
