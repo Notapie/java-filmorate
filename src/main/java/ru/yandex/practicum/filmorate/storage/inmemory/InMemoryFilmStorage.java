@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.inmemory;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -36,22 +36,39 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(final Film film) {
-        return null;
+        final Film oldRecord = idToFilm.get(film.getId());
+
+        if (oldRecord == null) {
+            throw new NotFoundException("Film with id " + film.getId() + " not found");
+        }
+
+        idToFilm.put(film.getId(), film);
+        orderedByLikesFilms.remove(oldRecord);
+        orderedByLikesFilms.add(film);
+
+        return film;
     }
 
     @Override
-    public void deleteFilm(final Film film) {
+    public Film deleteFilm(final int filmId) {
+        final Film oldRecord = idToFilm.remove(filmId);
 
+        if (oldRecord == null) {
+            throw new NotFoundException("Film with id " + filmId + " not found");
+        }
+
+        orderedByLikesFilms.remove(oldRecord);
+        return oldRecord;
     }
 
     @Override
-    public Film getFilmById(final int id) {
-        return null;
+    public Film getFilmById(final int filmId) {
+        return idToFilm.get(filmId);
     }
 
     @Override
     public Collection<Film> getFilmsSortedByLikes() {
-        return null;
+        return orderedByLikesFilms;
     }
 
     private static long getLikeIndex(final Film film, final int likesCount) {

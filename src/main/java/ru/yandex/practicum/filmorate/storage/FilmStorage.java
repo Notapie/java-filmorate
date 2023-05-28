@@ -9,9 +9,9 @@ public interface FilmStorage {
 
     Film updateFilm(Film film);
 
-    void deleteFilm(Film film);
+    Film deleteFilm(int filmId);
 
-    Film getFilmById(int id);
+    Film getFilmById(int filmId);
 
     Collection<Film> getFilmsSortedByLikes();
 }
