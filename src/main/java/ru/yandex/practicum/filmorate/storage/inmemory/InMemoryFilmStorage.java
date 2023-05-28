@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.inmemory;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -9,20 +10,28 @@ import java.util.*;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> idToFilm;
-    private final Map<Integer, Set<Integer>> userIdToLikedFilmsIds;
-    private final Map<Integer, Integer> filmIdToLikesCount;
     private final SortedSet<Film> orderedByLikesFilms;
+    private final Map<Integer, Set<Integer>> userIdToLikedFilmsIds;
+    private int idGenerator;
 
     public InMemoryFilmStorage() {
         this.idToFilm = new HashMap<>();
         this.orderedByLikesFilms = new TreeSet<>(new FilmByLikesComparator());
         this.userIdToLikedFilmsIds = new HashMap<>();
-        this.filmIdToLikesCount = new HashMap<>();
+        this.idGenerator = 1;
     }
 
     @Override
     public Film createFilm(final Film film) {
-        return null;
+        final Film createdFilm = film.toBuilder()
+                .id(idGenerator++)
+                .likesCount(0)
+                .build();
+
+        idToFilm.put(createdFilm.getId(), createdFilm);
+        orderedByLikesFilms.add(createdFilm);
+
+        return createdFilm;
     }
 
     @Override
