@@ -21,6 +21,11 @@ public class UserController {
         return service.getAll();
     }
 
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable final int userId) {
+        return service.getUser(userId);
+    }
+
     @PostMapping
     public User create(@Valid @RequestBody final User user) {
         return service.create(user);
@@ -29,5 +34,25 @@ public class UserController {
     @PutMapping
     public User update(@Valid @RequestBody final User user) {
         return service.update(user);
+    }
+
+    @GetMapping("/{userId}/friends")
+    public Collection<User> getUserFriends(@PathVariable final int userId) {
+        return service.getUserFriends(userId);
+    }
+
+    @GetMapping("/{userId}/friends/common/{otherId}")
+    public Collection<User> getUsersCommonFriends(@PathVariable final int userId, @PathVariable final int otherId) {
+        return service.getUsersCommonFriends(userId, otherId);
+    }
+
+    @PutMapping("/{userId}/friends/{friendId}")
+    public void addFriend(@PathVariable final int userId, @PathVariable final int friendId) {
+        service.linkFriends(userId, friendId);
+    }
+
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public void removeFriend(@PathVariable final int userId, @PathVariable final int friendId) {
+        service.unlinkFriends(userId, friendId);
     }
 }

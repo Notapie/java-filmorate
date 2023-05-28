@@ -26,6 +26,14 @@ public class FilmService {
         return filmStorage.getAll();
     }
 
+    public Film getFilm(final int id) {
+        final Film result = filmStorage.getFilmById(id);
+        if (result == null) {
+            throw new NotFoundException("Film with id " + id + " not found");
+        }
+        return result;
+    }
+
     public Collection<Film> getPopular(final int count) {
         final Collection<Film> sortedFilms = filmStorage.getFilmsSortedByLikes();
 

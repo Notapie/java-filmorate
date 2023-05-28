@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -18,7 +19,23 @@ public class UserService {
     private final UserStorage userStorage;
 
     public Collection<User> getAll() {
-        return null;
+        return userStorage.getAll();
+    }
+
+    public User getUser(final int id) {
+        final User result = userStorage.getUserById(id);
+        if (result == null) {
+            throw new NotFoundException("User with id " + id + " not found");
+        }
+        return result;
+    }
+
+    public Collection<User> getUserFriends(final int userId) {
+        return userStorage.getUserFriends(userId);
+    }
+
+    public Collection<User> getUsersCommonFriends(final int userId, final int otherId) {
+        return userStorage.getMutualFriends(userId, otherId);
     }
 
     public User create(final User user) {
@@ -51,6 +68,14 @@ public class UserService {
         log.debug("Updated user: " + newUser);
 
         return newUser;
+    }
+
+    public void linkFriends(final int userId, final int otherId) {
+        userStorage.linkAsFriends(userId, otherId);
+    }
+
+    public void unlinkFriends(final int userId, final int otherId) {
+        userStorage.unlinkFriends(userId, otherId);
     }
 
     private void validate(final User user) {

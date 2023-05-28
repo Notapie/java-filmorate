@@ -72,6 +72,7 @@ public class InMemoryUserStorage implements UserStorage {
             ));
         }
 
+        idToUser.put(user.getId(), user);
         emailToUser.put(user.getEmail(), user);
         loginToUser.put(user.getLogin(), user);
 
@@ -99,24 +100,24 @@ public class InMemoryUserStorage implements UserStorage {
         }
 
         // saving
-        return secondUserFriends.add(firstUserId) || firstUserFriends.add(secondUserId);
+        secondUserFriends.add(firstUserId);
+        firstUserFriends.add(secondUserId);
+        return true;
     }
 
     @Override
     public boolean unlinkFriends(final int firstUserId, final int secondUserId) {
-        boolean result = false;
-
         final Set<Integer> firstUserFriends = idToFriendsIds.get(firstUserId);
         final Set<Integer> secondUserFriends = idToFriendsIds.get(secondUserId);
 
         if (firstUserFriends != null) {
-            result = firstUserFriends.remove(secondUserId);
+            firstUserFriends.remove(secondUserId);
         }
         if (secondUserFriends != null) {
-            result = result || secondUserFriends.remove(firstUserId);
+            secondUserFriends.remove(firstUserId);
         }
 
-        return result;
+        return true;
     }
 
     @Override
@@ -130,6 +131,7 @@ public class InMemoryUserStorage implements UserStorage {
         emailToUser.remove(user.getEmail());
         loginToUser.remove(user.getLogin());
         idToFriendsIds.remove(id);
+
         return user;
     }
 

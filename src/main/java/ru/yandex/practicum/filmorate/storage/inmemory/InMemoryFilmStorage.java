@@ -44,11 +44,12 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException("Film with id " + film.getId() + " not found");
         }
 
-        idToFilm.put(film.getId(), film);
+        final Film newFilm = film.toBuilder().likesCount(oldRecord.getLikesCount()).build();
+        idToFilm.put(newFilm.getId(), newFilm);
         orderedByLikesFilms.remove(oldRecord);
-        orderedByLikesFilms.add(film);
+        orderedByLikesFilms.add(newFilm);
 
-        return film;
+        return newFilm;
     }
 
     @Override
