@@ -144,6 +144,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public Collection<User> getAll() {
+        return idToUser.values();
+    }
+
+    @Override
     public Collection<User> getUserFriends(final int userId) {
         final Collection<Integer> userFriendsIds = idToFriendsIds.get(userId);
 

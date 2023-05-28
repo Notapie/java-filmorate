@@ -19,6 +19,8 @@ public interface UserStorage {
 
     User getUserById(int id);
 
+    Collection<User> getAll();
+
     Collection<User> getUserFriends(int userId);
 
     Collection<User> getMutualFriends(int firstUserId, int secondUserId);
