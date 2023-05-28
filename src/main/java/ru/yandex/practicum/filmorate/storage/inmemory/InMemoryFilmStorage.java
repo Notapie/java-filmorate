@@ -12,12 +12,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> idToFilm;
     private final SortedSet<Film> orderedByLikesFilms;
     private final Map<Integer, Set<Integer>> userIdToLikedFilmsIds;
+    private final Map<Integer, Set<Integer>> filmToUserLiked;
     private int idGenerator;
 
     public InMemoryFilmStorage() {
         this.idToFilm = new HashMap<>();
         this.orderedByLikesFilms = new TreeSet<>(new FilmByLikesComparator());
         this.userIdToLikedFilmsIds = new HashMap<>();
+        this.filmToUserLiked = new HashMap<>();
         this.idGenerator = 1;
     }
 
@@ -57,13 +59,15 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException("Film with id " + filmId + " not found");
         }
 
-        Set<Integer> likedFilms = userIdToLikedFilmsIds.computeIfAbsent(userId, k -> new HashSet<>());
+        final Set<Integer> likedFilms = userIdToLikedFilmsIds.computeIfAbsent(userId, k -> new HashSet<>());
+        final Set<Integer> usersLiked = filmToUserLiked.computeIfAbsent(filmId, k -> new HashSet<>());
 
         if (likedFilms.contains(filmId)) {
             return false;
         }
 
         likedFilms.add(filmId);
+        usersLiked.add(userId);
         film = film.toBuilder().likesCount(film.getLikesCount() + 1).build();
         updateFilm(film);
 
@@ -76,8 +80,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (likedFilms == null || !likedFilms.contains(filmId)) {
             return false;
         }
-
         likedFilms.remove(filmId);
+
+        final Set<Integer> usersLiked = filmToUserLiked.get(filmId);
+        usersLiked.remove(filmId);
 
         Film film = idToFilm.get(filmId);
         if (film != null) {
