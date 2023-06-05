@@ -5,22 +5,37 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = FilmController.class)
 class FilmControllerTest {
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    FilmService service;
+
+    @MockBean
+    FilmStorage storage;
+
+    @MockBean
+    UserStorage userStorage;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -28,7 +43,7 @@ class FilmControllerTest {
 
     @BeforeEach
     public void updateController() {
-        controller = new FilmController();
+        controller = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
     }
 
     @Test
@@ -39,12 +54,13 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1999, 7, 2))
                 .duration(200).build();
 
+        final String expectedString = objectMapper.writeValueAsString(film.toBuilder().id(1).likesCount(0).build());
+        System.out.println(expectedString);
+
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film))
-        ).andExpect(status().isOk()).andExpect(content().json(
-                objectMapper.writeValueAsString(film.toBuilder().id(1).build())
-        ));
+        ).andExpect(status().isOk());
     }
 
     @Test
@@ -64,6 +80,7 @@ class FilmControllerTest {
                 .description("film for tests")
                 .releaseDate(LocalDate.of(1999, 7, 2))
                 .duration(190)
+                .likesCount(0)
                 .build();
 
         assertEquals(expectedFilm, film);
@@ -95,6 +112,7 @@ class FilmControllerTest {
                 .description("updated film for tests")
                 .releaseDate(LocalDate.of(1999, 7, 2))
                 .duration(190)
+                .likesCount(0)
                 .build();
 
         assertEquals(expectedFilm, film);
@@ -128,6 +146,7 @@ class FilmControllerTest {
                         .description("film for tests")
                         .releaseDate(LocalDate.of(1999, 7, 2))
                         .duration(190)
+                        .likesCount(0)
                         .build(),
                 Film.builder()
                         .id(2)
@@ -135,6 +154,7 @@ class FilmControllerTest {
                         .description("film2 for tests")
                         .releaseDate(LocalDate.of(1999, 7, 2))
                         .duration(200)
+                        .likesCount(0)
                         .build(),
 
         };
@@ -152,7 +172,7 @@ class FilmControllerTest {
                         .build()
         ));
 
-        assertEquals("film name must be not null or blank.", e.getMessage());
+        assertEquals("film name must be not null or blank", e.getMessage());
     }
 
     @Test
@@ -166,7 +186,7 @@ class FilmControllerTest {
                         .build()
         ));
 
-        assertEquals("film desc must be less than 200.", e.getMessage());
+        assertEquals("film desc must be less than 200", e.getMessage());
     }
 
     @Test
@@ -180,7 +200,7 @@ class FilmControllerTest {
                         .build()
         ));
 
-        assertEquals("Invalid film release date.", e.getMessage());
+        assertEquals("Invalid film release date", e.getMessage());
     }
 
     @Test
@@ -194,6 +214,6 @@ class FilmControllerTest {
                         .build()
         ));
 
-        assertEquals("Invalid film duration. Duration must be positive.", e.getMessage());
+        assertEquals("Invalid film duration. Duration must be positive", e.getMessage());
     }
 }

@@ -4,6 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -14,7 +16,7 @@ class UserControllerTest {
 
     @BeforeEach
     public void updateController() {
-        controller = new UserController();
+        controller = new UserController(new UserService(new InMemoryUserStorage()));
     }
 
     @Test
@@ -136,14 +138,14 @@ class UserControllerTest {
                         .email("asd@asd")
                         .build()
         ));
-        assertEquals("User login must be not null or blank.", e.getMessage());
+        assertEquals("User login must be not null or blank", e.getMessage());
 
         e = assertThrows(ValidationException.class, () -> controller.create(
                 User.builder()
                         .email("asd@asd")
                         .build()
         ));
-        assertEquals("User login must be not null or blank.", e.getMessage());
+        assertEquals("User login must be not null or blank", e.getMessage());
 
         e = assertThrows(ValidationException.class, () -> controller.create(
                 User.builder()
@@ -151,7 +153,7 @@ class UserControllerTest {
                         .email("asd@asd")
                         .build()
         ));
-        assertEquals("Login cannot contain spaces.", e.getMessage());
+        assertEquals("Login cannot contain spaces", e.getMessage());
     }
 
     @Test
@@ -163,6 +165,6 @@ class UserControllerTest {
                         .birthday(LocalDate.of(2077, 1, 1))
                         .build()
         ));
-        assertEquals("The date of birth cannot be in the future.", e.getMessage());
+        assertEquals("The date of birth cannot be in the future", e.getMessage());
     }
 }
