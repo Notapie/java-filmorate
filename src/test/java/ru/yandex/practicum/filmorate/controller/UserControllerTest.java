@@ -138,14 +138,14 @@ class UserControllerTest {
                         .email("asd@asd")
                         .build()
         ));
-        assertEquals("User login must be not null or blank.", e.getMessage());
+        assertEquals("User login must be not null or blank", e.getMessage());
 
         e = assertThrows(ValidationException.class, () -> controller.create(
                 User.builder()
                         .email("asd@asd")
                         .build()
         ));
-        assertEquals("User login must be not null or blank.", e.getMessage());
+        assertEquals("User login must be not null or blank", e.getMessage());
 
         e = assertThrows(ValidationException.class, () -> controller.create(
                 User.builder()
@@ -165,6 +165,6 @@ class UserControllerTest {
                         .birthday(LocalDate.of(2077, 1, 1))
                         .build()
         ));
-        assertEquals("The date of birth cannot be in the future.", e.getMessage());
+        assertEquals("The date of birth cannot be in the future", e.getMessage());
     }
 }
