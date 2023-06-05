@@ -153,7 +153,7 @@ class UserControllerTest {
                         .email("asd@asd")
                         .build()
         ));
-        assertEquals("Login cannot contain spaces.", e.getMessage());
+        assertEquals("Login cannot contain spaces", e.getMessage());
     }
 
     @Test
