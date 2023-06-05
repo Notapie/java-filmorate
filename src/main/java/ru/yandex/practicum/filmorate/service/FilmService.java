@@ -39,7 +39,7 @@ public class FilmService {
 
         final Collection<Film> result = new ArrayList<>();
         Iterator<Film> it = sortedFilms.iterator();
-        for(int i = 0; i < count && it.hasNext(); i++) {
+        for (int i = 0; i < count && it.hasNext(); i++) {
             result.add(it.next());
         }
 
