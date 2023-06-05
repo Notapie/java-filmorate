@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
 @RestControllerAdvice
 public class ErrorController {
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse notFound(final NotFoundException e) {
@@ -35,5 +34,4 @@ public class ErrorController {
                 "Validation error", e.getMessage()
         );
     }
-
 }

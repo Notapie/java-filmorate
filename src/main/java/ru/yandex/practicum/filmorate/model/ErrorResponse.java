@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Value
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ErrorResponse {
     String error;
     String description;
