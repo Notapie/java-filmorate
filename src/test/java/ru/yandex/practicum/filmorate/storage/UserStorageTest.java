@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 abstract class UserStorageTest {
     private UserStorage storage;
 
-    abstract protected UserStorage createNewStorage();
+    abstract UserStorage createNewStorage();
 
     @BeforeEach
     public void updateStorage() {
