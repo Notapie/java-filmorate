@@ -28,15 +28,13 @@ public class InMemoryUserStorage implements UserStorage {
     public User createUser(final User user) {
         if (emailToUser.containsKey(user.getEmail())) {
             throw new AlreadyExistsException(String.format(
-                    "User with email %s already exists"
-                    , user.getEmail()
+                    "User with email %s already exists", user.getEmail()
             ));
         }
 
         if (loginToUser.containsKey(user.getLogin())) {
             throw new AlreadyExistsException(String.format(
-                    "User with login %s already exists"
-                    , user.getLogin()
+                    "User with login %s already exists", user.getLogin()
             ));
         }
 
@@ -60,15 +58,13 @@ public class InMemoryUserStorage implements UserStorage {
 
         if (!oldRecord.getEmail().equals(user.getEmail()) && emailToUser.containsKey(user.getEmail())) {
             throw new AlreadyExistsException(String.format(
-                    "Email %s already exists"
-                    , user.getEmail()
+                    "Email %s already exists", user.getEmail()
             ));
         }
 
         if (!oldRecord.getLogin().equals(user.getLogin()) && loginToUser.containsKey(user.getLogin())) {
             throw new AlreadyExistsException(String.format(
-                    "Login %s already exists"
-                    , user.getLogin()
+                    "Login %s already exists", user.getLogin()
             ));
         }
 
