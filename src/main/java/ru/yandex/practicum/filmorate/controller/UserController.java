@@ -1,79 +1,58 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private final Map<Integer, User> idToUser = new HashMap<>();
-    int idGenerator = 1;
+    private final UserService service;
 
     @GetMapping
     public Collection<User> get() {
-        return idToUser.values();
+        return service.getAll();
+    }
+
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable final int userId) {
+        return service.getUser(userId);
     }
 
     @PostMapping
     public User create(@Valid @RequestBody final User user) {
-        validate(user);
-
-        final User.UserBuilder builder = user.toBuilder().id(idGenerator++);
-        if (user.getName() == null || user.getName().isBlank()) {
-            builder.name(user.getLogin());
-        }
-        final User newUser = builder.build();
-
-        idToUser.put(newUser.getId(), newUser);
-        log.debug("Added new user: " + newUser);
-
-        return newUser;
+        return service.create(user);
     }
 
     @PutMapping
     public User update(@Valid @RequestBody final User user) {
-        if (user.getId() == null) {
-            throw new ValidationException("User id must be not null.");
-        }
-        if (!idToUser.containsKey(user.getId())) {
-            throw new FilmNotFoundException("User with id " + user.getId() + " is not found.");
-        }
-        validate(user);
-
-        final User.UserBuilder builder = user.toBuilder();
-        if (user.getName() == null || user.getName().isBlank()) {
-            builder.name(user.getLogin());
-        }
-        final User newUser = builder.build();
-
-        final User prevFilm = idToUser.put(user.getId(), user);
-        log.debug("Updated user: " + prevFilm + " -> " + user);
-
-        return user;
+        return service.update(user);
     }
 
-    private void validate(final User user) {
-        if (!StringUtils.hasText(user.getLogin())) {
-            throw new ValidationException("User login must be not null or blank.");
-        }
+    @GetMapping("/{userId}/friends")
+    public Collection<User> getUserFriends(@PathVariable final int userId) {
+        return service.getUserFriends(userId);
+    }
 
-        if (user.getLogin().contains(" ")) {
-            throw new ValidationException("Login cannot contain spaces.");
-        }
+    @GetMapping("/{userId}/friends/common/{otherId}")
+    public Collection<User> getUsersCommonFriends(@PathVariable final int userId, @PathVariable final int otherId) {
+        return service.getUsersCommonFriends(userId, otherId);
+    }
 
-        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("The date of birth cannot be in the future.");
-        }
+    @PutMapping("/{userId}/friends/{friendId}")
+    public void addFriend(@PathVariable final int userId, @PathVariable final int friendId) {
+        service.linkFriends(userId, friendId);
+    }
+
+    @DeleteMapping("/{userId}/friends/{friendId}")
+    public void removeFriend(@PathVariable final int userId, @PathVariable final int friendId) {
+        service.unlinkFriends(userId, friendId);
     }
 }
