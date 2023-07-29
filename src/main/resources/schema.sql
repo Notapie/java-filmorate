@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS "user" (
 
 CREATE TABLE IF NOT EXISTS "user_friend" (
     user_id INTEGER REFERENCES "user" (id) ON DELETE CASCADE,
-    friend_id INTEGER REFERENCES "user" (id) ON DELETE CASCADE
+    friend_id INTEGER REFERENCES "user" (id) ON DELETE CASCADE,
+    is_viewed BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS "film" (
