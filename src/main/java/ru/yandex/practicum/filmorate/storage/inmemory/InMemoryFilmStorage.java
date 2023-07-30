@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.inmemory;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -53,7 +54,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean addLike(final int userId, final int filmId) {
+    public void addLike(final int userId, final int filmId) {
         Film film = idToFilm.get(filmId);
 
         if (film == null) {
@@ -64,22 +65,20 @@ public class InMemoryFilmStorage implements FilmStorage {
         final Set<Integer> usersLiked = filmToUserLiked.computeIfAbsent(filmId, k -> new HashSet<>());
 
         if (likedFilms.contains(filmId)) {
-            return false;
+            throw new AlreadyExistsException("The movie id " + filmId + " is already in favorites");
         }
 
         likedFilms.add(filmId);
         usersLiked.add(userId);
         film = film.toBuilder().likesCount(film.getLikesCount() + 1).build();
         update(film);
-
-        return true;
     }
 
     @Override
-    public boolean removeLike(int userId, int filmId) {
+    public void removeLike(int userId, int filmId) {
         final Set<Integer> likedFilms = userIdToLikedFilmsIds.get(userId);
         if (likedFilms == null || !likedFilms.contains(filmId)) {
-            return false;
+            throw new NotFoundException("Film with id " + filmId + " not found in favorites");
         }
         likedFilms.remove(filmId);
 
@@ -92,8 +91,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             film = film.toBuilder().likesCount(newLikesCount).build();
             update(film);
         }
-
-        return true;
     }
 
     @Override

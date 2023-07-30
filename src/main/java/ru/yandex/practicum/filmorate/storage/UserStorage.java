@@ -6,9 +6,9 @@ import java.util.Collection;
 
 public interface UserStorage extends StorageBase<User> {
 
-    boolean linkAsFriends(int firstUserId, int secondUserId);
+    void linkAsFriends(int firstUserId, int secondUserId);
 
-    boolean unlinkFriends(int firstUserId, int secondUserId);
+    void unlinkFriends(int firstUserId, int secondUserId);
 
     User getUserByEmail(String email);
 

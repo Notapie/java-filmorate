@@ -83,7 +83,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean linkAsFriends(final int firstUserId, final int secondUserId) {
+    public void linkAsFriends(final int firstUserId, final int secondUserId) {
         // check if users exists
         final Set<Integer> firstUserFriends = idToFriendsIds.get(firstUserId);
         final Set<Integer> secondUserFriends = idToFriendsIds.get(secondUserId);
@@ -98,11 +98,10 @@ public class InMemoryUserStorage implements UserStorage {
         // saving
         secondUserFriends.add(firstUserId);
         firstUserFriends.add(secondUserId);
-        return true;
     }
 
     @Override
-    public boolean unlinkFriends(final int firstUserId, final int secondUserId) {
+    public void unlinkFriends(final int firstUserId, final int secondUserId) {
         final Set<Integer> firstUserFriends = idToFriendsIds.get(firstUserId);
         final Set<Integer> secondUserFriends = idToFriendsIds.get(secondUserId);
 
@@ -112,8 +111,6 @@ public class InMemoryUserStorage implements UserStorage {
         if (secondUserFriends != null) {
             secondUserFriends.remove(firstUserId);
         }
-
-        return true;
     }
 
     @Override
