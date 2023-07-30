@@ -31,9 +31,8 @@ CREATE TABLE IF NOT EXISTS "film" (
     title VARCHAR(64),
     rating_id INTEGER REFERENCES "rating" (id) ON DELETE SET NULL,
     description VARCHAR(1024),
-    release_date timestamp,
-    duration INTEGER,
-    likes_count INTEGER
+    release_date DATE,
+    duration INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS "film_genre" (
