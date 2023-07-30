@@ -5,14 +5,17 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.List;
 
 @Component
 @Primary
@@ -79,6 +82,14 @@ public class FilmDao implements FilmStorage {
 
     @Override
     public Collection<Film> getFilmsSortedByLikes() {
+        final String sql = "SELECT f.*, COUNT(uf.id) AS likes_count " +
+                "FROM \"film\" AS f " +
+                "LEFT JOIN \"user_favorite\" AS uf ON uf.film_id = f.id " +
+                "GROUP BY f.id " +
+                "HAVING likes_count > ? AND f.id > ?" +
+                "ORDER BY likes_count, f.id " +
+                "LIMIT ?";
+
         return null;
     }
 
@@ -89,6 +100,28 @@ public class FilmDao implements FilmStorage {
 
     @Override
     public Film getById(int id) {
-        return null;
+        final String sql = "SELECT f.*, COUNT(uf.id) AS likes_count " +
+                "FROM \"film\" AS f " +
+                "LEFT JOIN \"user_favorite\" AS uf ON uf.film_id = f.id " +
+                "WHERE f.id = ? " +
+                "GROUP BY f.id";
+
+        final List<Film> result = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), id);
+
+        if (result.isEmpty()) {
+            throw new NotFoundException("Film with id " + id + " not found");
+        }
+        return result.get(0);
+    }
+
+    private Film makeFilm(final ResultSet resultSet) throws SQLException {
+        return Film.builder()
+                .id(resultSet.getInt("id"))
+                .name(resultSet.getString("title"))
+                .description(resultSet.getString("description"))
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
+                .duration(resultSet.getInt("duration"))
+                .likesCount(resultSet.getInt("likes_count"))
+                .build();
     }
 }
