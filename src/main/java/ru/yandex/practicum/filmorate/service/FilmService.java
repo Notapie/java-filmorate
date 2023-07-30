@@ -27,7 +27,7 @@ public class FilmService {
     }
 
     public Film getFilm(final int id) {
-        final Film result = filmStorage.getFilmById(id);
+        final Film result = filmStorage.getById(id);
         if (result == null) {
             throw new NotFoundException("Film with id " + id + " not found");
         }
@@ -47,14 +47,14 @@ public class FilmService {
     }
 
     public void addLike(final int userId, final int filmId) {
-        if (userStorage.getUserById(userId) == null) {
+        if (userStorage.getById(userId) == null) {
             throw new NotFoundException("User with id " + userId + " not found");
         }
         filmStorage.addLike(userId, filmId);
     }
 
     public void removeLike(final int userId, final int filmId) {
-        if (userStorage.getUserById(userId) == null) {
+        if (userStorage.getById(userId) == null) {
             throw new NotFoundException("User with id " + userId + " not found");
         }
         filmStorage.removeLike(userId, filmId);
@@ -63,7 +63,7 @@ public class FilmService {
     public Film create(final Film film) {
         validate(film);
 
-        final Film newFilm = filmStorage.createFilm(film);
+        final Film newFilm = filmStorage.create(film);
         log.debug("Added new film: " + newFilm);
 
         return newFilm;
@@ -75,7 +75,7 @@ public class FilmService {
         }
         validate(film);
 
-        final Film newFilm = filmStorage.updateFilm(film);
+        final Film newFilm = filmStorage.update(film);
         log.debug("Updated film: " + film);
 
         return newFilm;

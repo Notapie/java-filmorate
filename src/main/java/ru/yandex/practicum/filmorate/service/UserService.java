@@ -23,7 +23,7 @@ public class UserService {
     }
 
     public User getUser(final int id) {
-        final User result = userStorage.getUserById(id);
+        final User result = userStorage.getById(id);
         if (result == null) {
             throw new NotFoundException("User with id " + id + " not found");
         }
@@ -46,7 +46,7 @@ public class UserService {
             builder.name(user.getLogin());
         }
 
-        final User newUser = userStorage.createUser(builder.build());
+        final User newUser = userStorage.create(builder.build());
         log.debug("Added new user: " + newUser);
 
         return newUser;
@@ -64,7 +64,7 @@ public class UserService {
             builder.name(user.getLogin());
         }
 
-        final User newUser = userStorage.updateUser(builder.build());
+        final User newUser = userStorage.update(builder.build());
         log.debug("Updated user: " + newUser);
 
         return newUser;

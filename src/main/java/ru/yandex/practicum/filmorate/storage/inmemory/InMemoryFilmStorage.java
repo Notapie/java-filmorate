@@ -24,7 +24,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film createFilm(final Film film) {
+    public Film create(final Film film) {
         final Film createdFilm = film.toBuilder()
                 .id(idGenerator++)
                 .likesCount(0)
@@ -37,7 +37,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(final Film film) {
+    public Film update(final Film film) {
         final Film oldRecord = idToFilm.get(film.getId());
 
         if (oldRecord == null) {
@@ -70,7 +70,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         likedFilms.add(filmId);
         usersLiked.add(userId);
         film = film.toBuilder().likesCount(film.getLikesCount() + 1).build();
-        updateFilm(film);
+        update(film);
 
         return true;
     }
@@ -90,14 +90,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film != null) {
             final int newLikesCount = Integer.max(film.getLikesCount() - 1, 0);
             film = film.toBuilder().likesCount(newLikesCount).build();
-            updateFilm(film);
+            update(film);
         }
 
         return true;
     }
 
     @Override
-    public Film deleteFilm(final int filmId) {
+    public Film delete(final int filmId) {
         final Film oldRecord = idToFilm.remove(filmId);
 
         if (oldRecord == null) {
@@ -109,7 +109,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(final int filmId) {
+    public Film getById(final int filmId) {
         return idToFilm.get(filmId);
     }
 

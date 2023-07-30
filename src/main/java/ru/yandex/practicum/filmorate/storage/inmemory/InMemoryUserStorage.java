@@ -25,7 +25,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User createUser(final User user) {
+    public User create(final User user) {
         if (emailToUser.containsKey(user.getEmail())) {
             throw new AlreadyExistsException(String.format(
                     "User with email %s already exists", user.getEmail()
@@ -49,7 +49,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(final User user) {
+    public User update(final User user) {
         final User oldRecord = idToUser.get(user.getId());
 
         if (oldRecord == null) {
@@ -117,7 +117,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User removeUser(final int id) {
+    public User delete(final int id) {
         final User user = idToUser.remove(id);
 
         if (user == null) {
@@ -137,7 +137,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(final int id) {
+    public User getById(final int id) {
         return idToUser.get(id);
     }
 

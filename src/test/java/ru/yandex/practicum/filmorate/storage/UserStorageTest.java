@@ -27,9 +27,9 @@ abstract class UserStorageTest {
                 .birthday(LocalDate.of(1999, 7, 2))
                 .build();
 
-        storage.createUser(user);
+        storage.create(user);
 
         user = user.toBuilder().id(1).build();
-        assertEquals(user, storage.getUserById(1));
+        assertEquals(user, storage.getById(1));
     }
 }
