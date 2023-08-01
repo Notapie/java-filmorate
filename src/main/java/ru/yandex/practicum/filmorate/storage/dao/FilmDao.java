@@ -100,11 +100,7 @@ public class FilmDao implements FilmStorage {
 
     @Override
     public Film getById(int id) {
-        final String sql = "SELECT f.*, COUNT(uf.id) AS likes_count " +
-                "FROM \"film\" AS f " +
-                "LEFT JOIN \"user_favorite\" AS uf ON uf.film_id = f.id " +
-                "WHERE f.id = ? " +
-                "GROUP BY f.id";
+        final String sql = "SELECT * FROM \"film\" WHERE id = ?";
 
         final List<Film> result = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), id);
 
