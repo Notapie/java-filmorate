@@ -111,8 +111,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getFilmsSortedByLikes() {
-        return orderedByLikesFilms;
+    public Collection<Film> getFilmsSortedByLikes(final int limit) {
+        final Collection<Film> result = new ArrayList<>();
+        Iterator<Film> it = orderedByLikesFilms.iterator();
+        for (int i = 0; i < limit && it.hasNext(); i++) {
+            result.add(it.next());
+        }
+
+        return result;
     }
 
     @Override

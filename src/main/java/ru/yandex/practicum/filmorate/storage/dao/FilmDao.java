@@ -26,20 +26,26 @@ public class FilmDao implements FilmStorage {
     // TODO: add exceptions and handlers for them
     @Override
     public void addLike(int userId, int filmId) {
-        final String sql = "INSERT INTO \"user_favorite\" (user_id, film_id) VALUES (?, ?)";
-        jdbcTemplate.update(sql, userId, filmId);
+        final String sql = "INSERT INTO \"user_favorite\" (user_id, film_id) VALUES (?, ?); " +
+            "UPDATE \"film\" SET likes_count = likes_count + 1 WHERE id = ?";
+        jdbcTemplate.update(sql, userId, filmId, filmId);
     }
 
     @Override
     public void removeLike(int userId, int filmId) {
-        final String sql = "DELETE FROM \"user_favorite\" WHERE user_id = ? AND film_id = ?";
-        jdbcTemplate.update(sql, userId, filmId);
+        final String removeSql = "DELETE FROM \"user_favorite\" WHERE user_id = ? AND film_id = ?";
+        boolean isRemoved = jdbcTemplate.update(removeSql, userId, filmId) > 0;
+
+        if (isRemoved) {
+            final String decrementSql = "UPDATE \"film\" SET likes_count = likes_count - 1 WHERE id = ?";
+            jdbcTemplate.update(decrementSql, filmId);
+        }
     }
 
     @Override
     public Film update(Film newObject) {
         final String sql = "UPDATE \"film\" " +
-                "SET name = ?, description = ?, release_date = ?, duration = ? WHERE film_id = ?";
+            "SET name = ?, description = ?, release_date = ?, duration = ? WHERE film_id = ?";
 
         jdbcTemplate.update(sql,
                 newObject.getName(), newObject.getDescription(),
@@ -81,21 +87,22 @@ public class FilmDao implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getFilmsSortedByLikes() {
-        final String sql = "SELECT f.*, COUNT(uf.id) AS likes_count " +
-                "FROM \"film\" AS f " +
-                "LEFT JOIN \"user_favorite\" AS uf ON uf.film_id = f.id " +
-                "GROUP BY f.id " +
-                "HAVING likes_count > ? AND f.id > ?" +
-                "ORDER BY likes_count, f.id " +
+    public Collection<Film> getFilmsSortedByLikes(final int limit) {
+        final String sql = "SELECT * " +
+                "FROM \"film\" " +
+                "ORDER BY likes_count " +
                 "LIMIT ?";
 
-        return null;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), limit);
     }
 
     @Override
     public Collection<Film> getAll() {
-        return null;
+        final String sql = "SELECT * " +
+                "FROM \"film\" " +
+                "ORDER BY id";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs));
     }
 
     @Override

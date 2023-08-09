@@ -11,9 +11,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 @Slf4j
 @Service
@@ -34,16 +32,8 @@ public class FilmService {
         return result;
     }
 
-    public Collection<Film> getPopular(final int count) {
-        final Collection<Film> sortedFilms = filmStorage.getFilmsSortedByLikes();
-
-        final Collection<Film> result = new ArrayList<>();
-        Iterator<Film> it = sortedFilms.iterator();
-        for (int i = 0; i < count && it.hasNext(); i++) {
-            result.add(it.next());
-        }
-
-        return result;
+    public Collection<Film> getPopular(final int limit) {
+        return filmStorage.getFilmsSortedByLikes(limit);
     }
 
     public void addLike(final int userId, final int filmId) {

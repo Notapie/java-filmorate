@@ -9,5 +9,5 @@ public interface FilmStorage extends StorageBase<Film> {
 
     void removeLike(int userId, int filmId);
 
-    Collection<Film> getFilmsSortedByLikes();
+    Collection<Film> getFilmsSortedByLikes(int limit);
 }
