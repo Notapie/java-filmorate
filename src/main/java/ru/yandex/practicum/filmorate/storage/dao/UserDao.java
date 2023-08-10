@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -18,6 +19,8 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class UserDao implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
+
+    // TODO: add exceptions and handlers for them
     @Override
     public User update(final User newObject) {
         final String sql = "UPDATE \"user\" " +
@@ -54,7 +57,12 @@ public class UserDao implements UserStorage {
 
     @Override
     public User delete(final int id) {
-        return null;
+        final User userToRemove = getById(id);
+
+        final String sql = "DELETE FROM \"user\" WHERE id = ?";
+        jdbcTemplate.update(sql, id);
+
+        return userToRemove;
     }
 
     @Override

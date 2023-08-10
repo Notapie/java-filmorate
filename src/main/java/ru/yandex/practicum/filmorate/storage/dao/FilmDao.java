@@ -80,7 +80,7 @@ public class FilmDao implements FilmStorage {
     public Film delete(int id) {
         final Film filmToRemove = getById(id);
 
-        final String sql = "DELETE FROM \"film\" WHERE film_id = ?";
+        final String sql = "DELETE FROM \"film\" WHERE id = ?";
         jdbcTemplate.update(sql, id);
 
         return filmToRemove;
