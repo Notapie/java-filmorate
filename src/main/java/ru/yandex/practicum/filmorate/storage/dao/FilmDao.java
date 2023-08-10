@@ -90,7 +90,7 @@ public class FilmDao implements FilmStorage {
     public Collection<Film> getFilmsSortedByLikes(final int limit) {
         final String sql = "SELECT * " +
                 "FROM \"film\" " +
-                "ORDER BY likes_count " +
+                "ORDER BY likes_count DESC " +
                 "LIMIT ?";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), limit);

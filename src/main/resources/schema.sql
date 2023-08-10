@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS "film" (
     description VARCHAR(1024),
     release_date DATE,
     duration INTEGER,
-    likes_count INTEGER
+    likes_count INTEGER DEFAULT 0
 );
 
 CREATE INDEX IF NOT EXISTS "film_likes_idx"
