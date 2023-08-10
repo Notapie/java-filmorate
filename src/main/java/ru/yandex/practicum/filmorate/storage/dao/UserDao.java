@@ -34,7 +34,7 @@ public class UserDao implements UserStorage {
             ps.setString(1, newObject.getEmail());
             ps.setString(2, newObject.getLogin());
             ps.setString(3, newObject.getName());
-            ps.setString(3, newObject.getBirthday().toString());
+            ps.setString(4, newObject.getBirthday().toString());
             return ps;
         }, keyHolder);
 
