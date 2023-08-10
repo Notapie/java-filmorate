@@ -6,12 +6,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.List;
 
 @Component
 @Primary
@@ -25,12 +29,16 @@ public class UserDao implements UserStorage {
         final String sql = "UPDATE \"user\" " +
                 "SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
 
-        jdbcTemplate.update(sql,
-                newObject.getName(), newObject.getLogin(),
+        boolean isUpdated = jdbcTemplate.update(sql,
+                newObject.getEmail(), newObject.getLogin(),
                 newObject.getName(), newObject.getBirthday(),
-                newObject.getId());
+                newObject.getId()) > 0;
 
-        return newObject;
+        if (!isUpdated) {
+            throw new NotFoundException("Film with id " + newObject.getId() + " is not found");
+        }
+
+        return getById(newObject.getId());
     }
 
     @Override
@@ -51,6 +59,7 @@ public class UserDao implements UserStorage {
         if (keyHolder.getKey() == null) {
             throw new RuntimeException("Error getting the new user id");
         }
+
         return newObject.toBuilder().id(keyHolder.getKey().intValue()).build();
     }
 
@@ -66,12 +75,20 @@ public class UserDao implements UserStorage {
 
     @Override
     public Collection<User> getAll() {
-        return null;
+        final String sql = "SELECT * FROM \"user\"";
+        return jdbcTemplate.query(sql, (rs, rn) -> makeUser(rs));
     }
 
     @Override
     public User getById(final int id) {
-        return null;
+        final String sql = "SELECT * FROM \"user\" WHERE id = ?";
+        List<User> result = jdbcTemplate.query(sql, (rs, rn) -> makeUser(rs), id);
+
+        if (result.isEmpty()) {
+            throw new NotFoundException("User with id " + id + " is not found");
+        }
+
+        return result.get(0);
     }
 
     @Override
@@ -97,5 +114,15 @@ public class UserDao implements UserStorage {
     @Override
     public Collection<User> getMutualFriends(final int firstUserId, final int secondUserId) {
         return null;
+    }
+
+    private User makeUser(final ResultSet resultSet) throws SQLException {
+        return User.builder()
+                .id(resultSet.getInt("id"))
+                .email(resultSet.getString("email"))
+                .name(resultSet.getString("name"))
+                .login(resultSet.getString("login"))
+                .birthday(resultSet.getDate("birthday").toLocalDate())
+                .build();
     }
 }

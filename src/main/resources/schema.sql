@@ -3,8 +3,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     email VARCHAR(64),
     login VARCHAR(64),
     name VARCHAR(64),
-    birthday TIMESTAMP,
-    friends_count INTEGER
+    birthday TIMESTAMP
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS "user_email_unique_idx"

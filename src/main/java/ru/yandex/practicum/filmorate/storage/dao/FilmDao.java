@@ -45,14 +45,18 @@ public class FilmDao implements FilmStorage {
     @Override
     public Film update(Film newObject) {
         final String sql = "UPDATE \"film\" " +
-            "SET name = ?, description = ?, release_date = ?, duration = ? WHERE id = ?";
+            "SET title = ?, description = ?, release_date = ?, duration = ? WHERE id = ?";
 
-        jdbcTemplate.update(sql,
+        boolean isUpdated = jdbcTemplate.update(sql,
                 newObject.getName(), newObject.getDescription(),
                 newObject.getReleaseDate().toString(), newObject.getDuration(),
-                newObject.getId());
+                newObject.getId()) > 0;
 
-        return newObject;
+        if (!isUpdated) {
+            throw new NotFoundException("Film with id " + newObject.getId() + " is not found");
+        }
+
+        return getById(newObject.getId());
     }
 
     @Override
@@ -73,6 +77,7 @@ public class FilmDao implements FilmStorage {
         if (keyHolder.getKey() == null) {
             throw new RuntimeException("Error getting the new film id");
         }
+
         return newObject.toBuilder().id(keyHolder.getKey().intValue()).likesCount(0).build();
     }
 
@@ -98,10 +103,7 @@ public class FilmDao implements FilmStorage {
 
     @Override
     public Collection<Film> getAll() {
-        final String sql = "SELECT * " +
-                "FROM \"film\" " +
-                "ORDER BY id";
-
+        final String sql = "SELECT * FROM \"film\"";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs));
     }
 
