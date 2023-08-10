@@ -20,7 +20,15 @@ public class UserDao implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
     @Override
     public User update(final User newObject) {
-        return null;
+        final String sql = "UPDATE \"user\" " +
+                "SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
+
+        jdbcTemplate.update(sql,
+                newObject.getName(), newObject.getLogin(),
+                newObject.getName(), newObject.getBirthday(),
+                newObject.getId());
+
+        return newObject;
     }
 
     @Override

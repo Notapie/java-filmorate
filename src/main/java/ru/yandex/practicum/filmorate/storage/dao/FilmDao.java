@@ -45,7 +45,7 @@ public class FilmDao implements FilmStorage {
     @Override
     public Film update(Film newObject) {
         final String sql = "UPDATE \"film\" " +
-            "SET name = ?, description = ?, release_date = ?, duration = ? WHERE film_id = ?";
+            "SET name = ?, description = ?, release_date = ?, duration = ? WHERE id = ?";
 
         jdbcTemplate.update(sql,
                 newObject.getName(), newObject.getDescription(),
