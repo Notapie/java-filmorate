@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -92,8 +93,27 @@ public class UserDao implements UserStorage {
     }
 
     @Override
-    public void linkAsFriends(final int firstUserId, final int secondUserId) {
+    public User getUserByEmail(final String email) {
+        final String sql = "SELECT * FROM \"user\" WHERE email = ?";
+        List<User> result = jdbcTemplate.query(sql, (rs, rn) -> makeUser(rs), email);
 
+        if (result.isEmpty()) {
+            throw new NotFoundException("User with email " + email + " is not found");
+        }
+
+        return result.get(0);
+    }
+
+    @Override
+    public void linkAsFriends(final int firstUserId, final int secondUserId) {
+        final String sql = "INSERT INTO \"user_friend\" " +
+                "(user_id, friend_id, is_accepted) VALUES (?, ?, ?)";
+
+        try {
+            jdbcTemplate.update(sql, firstUserId, secondUserId, false);
+        } catch (DataAccessException e) {
+            throw new NotFoundException("invalid friend id or user id");
+        }
     }
 
     @Override
@@ -102,18 +122,22 @@ public class UserDao implements UserStorage {
     }
 
     @Override
-    public User getUserByEmail(final String email) {
-        return null;
-    }
-
-    @Override
     public Collection<User> getUserFriends(final int userId) {
-        return null;
+        final String sql = "SELECT u.* FROM \"user_friend\" AS uf " +
+                "INNER JOIN \"user\" AS u ON uf.friend_id = u.id " +
+                "WHERE uf.user_id = ?";
+
+        return jdbcTemplate.query(sql, (rs, rn) -> makeUser(rs), userId);
     }
 
     @Override
     public Collection<User> getMutualFriends(final int firstUserId, final int secondUserId) {
-        return null;
+        final String sql = "SELECT u.* FROM \"user_friend\" AS uf " +
+                "INNER JOIN \"user\" AS u ON uf.friend_id = u.id " +
+                "WHERE uf.user_id = ? " +
+                "AND uf.friend_id IN (SELECT friend_id FROM \"user_friend\" WHERE user_id = ?)";
+
+        return jdbcTemplate.query(sql, (rs, rn) -> makeUser(rs), firstUserId, secondUserId);
     }
 
     private User makeUser(final ResultSet resultSet) throws SQLException {
