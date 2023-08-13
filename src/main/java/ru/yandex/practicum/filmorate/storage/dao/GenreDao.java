@@ -109,15 +109,13 @@ public class GenreDao implements GenreStorage {
             params.add(genre);
         }
 
-        try {
-            jdbcTemplate.update(connection -> {
-                PreparedStatement ps = connection.prepareStatement(addGenresSql.toString());
-                for (int i = 0; i < params.size(); ++i) {
-                    ps.setInt(i + 1, params.get(i));
-                }
-                return ps;
-            });
-        } catch (DataAccessException ignored) {}
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(addGenresSql.toString());
+            for (int i = 0; i < params.size(); ++i) {
+                ps.setInt(i + 1, params.get(i));
+            }
+            return ps;
+        });
     }
 
     @Override
