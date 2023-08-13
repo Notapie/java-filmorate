@@ -36,7 +36,7 @@ public class UserDao implements UserStorage {
                 newObject.getId()) > 0;
 
         if (!isUpdated) {
-            throw new NotFoundException("Film with id " + newObject.getId() + " is not found");
+            throw new NotFoundException("User with id " + newObject.getId() + " is not found");
         }
 
         return getById(newObject.getId());
@@ -112,7 +112,7 @@ public class UserDao implements UserStorage {
         try {
             jdbcTemplate.update(sql, firstUserId, secondUserId, false);
         } catch (DataAccessException e) {
-            throw new NotFoundException("invalid friend id or user id");
+            throw new NotFoundException("invalid friend or user id");
         }
     }
 
