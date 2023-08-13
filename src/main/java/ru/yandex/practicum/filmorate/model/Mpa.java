@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 @Builder(toBuilder = true)
-public class Rating {
+public class Mpa {
     Integer id;
     String name;
 }
