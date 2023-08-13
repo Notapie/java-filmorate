@@ -14,22 +14,22 @@ public class GenreService {
     private GenreStorage storage;
 
     // TODO: add logs and validation
-    Genre createNewGenre(final Genre newObject) {
+    public Genre createNewGenre(final Genre newObject) {
         return storage.create(newObject);
     }
 
-    Genre updateGenre(final Genre newObject) {
+    public Genre updateGenre(final Genre newObject) {
         if (newObject.getId() == null) {
             throw new ValidationException("Genre id must be not null");
         }
         return storage.update(newObject);
     }
 
-    Collection<Genre> getAllGenres() {
+    public Collection<Genre> getAllGenres() {
         return storage.getAll();
     }
 
-    Genre getGenreById(final int id) {
+    public Genre getGenreById(final int id) {
         return storage.getById(id);
     }
 }
