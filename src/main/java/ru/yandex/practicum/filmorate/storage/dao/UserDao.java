@@ -118,7 +118,8 @@ public class UserDao implements UserStorage {
 
     @Override
     public void unlinkFriends(final int firstUserId, final int secondUserId) {
-
+        final String sql = "DELETE FROM \"user_friend\" WHERE user_id = ? AND friend_id = ?";
+        jdbcTemplate.update(sql, firstUserId, secondUserId);
     }
 
     @Override
