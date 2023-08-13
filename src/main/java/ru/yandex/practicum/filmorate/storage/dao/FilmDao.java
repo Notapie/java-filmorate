@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FilmDao implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final MpaStorage mpaStorage;
 
     // TODO: add exceptions and handlers for them
     @Override
@@ -45,11 +47,11 @@ public class FilmDao implements FilmStorage {
     @Override
     public Film update(Film newObject) {
         final String sql = "UPDATE \"film\" " +
-            "SET title = ?, description = ?, release_date = ?, duration = ? WHERE id = ?";
+            "SET title = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE id = ?";
 
         boolean isUpdated = jdbcTemplate.update(sql,
-                newObject.getName(), newObject.getDescription(),
-                newObject.getReleaseDate().toString(), newObject.getDuration(),
+                newObject.getName(), newObject.getDescription(), newObject.getReleaseDate().toString(),
+                newObject.getDuration(), newObject.getMpa().getId(),
                 newObject.getId()) > 0;
 
         if (!isUpdated) {
@@ -61,7 +63,8 @@ public class FilmDao implements FilmStorage {
 
     @Override
     public Film create(Film newObject) {
-        final String sql = "INSERT INTO \"film\" (title, description, release_date, duration) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO \"film\" (title, description, release_date, duration, mpa_id)" +
+                "VALUES (?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -71,6 +74,7 @@ public class FilmDao implements FilmStorage {
             ps.setString(2, newObject.getDescription());
             ps.setString(3, newObject.getReleaseDate().toString());
             ps.setInt(4, newObject.getDuration());
+            ps.setInt(5, newObject.getMpa().getId());
             return ps;
         }, keyHolder);
 
@@ -124,6 +128,9 @@ public class FilmDao implements FilmStorage {
                 .id(resultSet.getInt("id"))
                 .name(resultSet.getString("title"))
                 .description(resultSet.getString("description"))
+
+                // TODO: think about mpa_id can be null in db
+                .mpa(mpaStorage.getById(resultSet.getInt("mpa_id")))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
                 .likesCount(resultSet.getInt("likes_count"))
