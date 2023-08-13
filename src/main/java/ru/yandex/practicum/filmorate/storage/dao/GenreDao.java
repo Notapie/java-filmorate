@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.dao;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -13,8 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -79,6 +79,53 @@ public class GenreDao implements GenreStorage {
         }
 
         return result.get(0);
+    }
+
+    @Override
+    public void setFilmGenres(final int filmId, final Collection<Genre> genres) {
+        final String sql = "DELETE FROM \"film_genre\" WHERE film_id = ?";
+        jdbcTemplate.update(sql, filmId);
+
+        if (genres == null || genres.isEmpty()) {
+            return;
+        }
+
+        final Set<Integer> uniqGenreIds = new HashSet<>();
+        for (final Genre genre : genres) {
+            uniqGenreIds.add(genre.getId());
+        }
+
+        StringBuilder addGenresSql = new StringBuilder("INSERT INTO \"film_genre\" (film_id, genre_id) VALUES ");
+        List<Integer> params = new ArrayList<>();
+
+        int isFirst = 0;
+        for (final int genre : uniqGenreIds) {
+            if (isFirst++ > 0) {
+                addGenresSql.append(", ");
+            }
+
+            addGenresSql.append("(?, ?)");
+            params.add(filmId);
+            params.add(genre);
+        }
+
+        try {
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement(addGenresSql.toString());
+                for (int i = 0; i < params.size(); ++i) {
+                    ps.setInt(i + 1, params.get(i));
+                }
+                return ps;
+            });
+        } catch (DataAccessException ignored) {}
+    }
+
+    @Override
+    public Collection<Genre> getFilmGenres(int filmId) {
+        final String sql = "SELECT g.* FROM \"film_genre\" AS fg " +
+                "RIGHT JOIN \"genre\" AS g ON fg.genre_id = g.id " +
+                "WHERE fg.film_id = ?";
+        return jdbcTemplate.query(sql, (rs, rn) -> makeGenre(rs), filmId);
     }
 
     private Genre makeGenre(final ResultSet resultSet) throws SQLException {

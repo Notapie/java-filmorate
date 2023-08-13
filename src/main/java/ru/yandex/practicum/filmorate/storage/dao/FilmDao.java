@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
 import java.sql.PreparedStatement;
@@ -24,6 +25,7 @@ import java.util.List;
 public class FilmDao implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final MpaStorage mpaStorage;
+    private final GenreStorage genreStorage;
 
     // TODO: add exceptions and handlers for them
     @Override
@@ -58,6 +60,8 @@ public class FilmDao implements FilmStorage {
             throw new NotFoundException("Film with id " + newObject.getId() + " is not found");
         }
 
+        genreStorage.setFilmGenres(newObject.getId(), newObject.getGenres());
+
         return getById(newObject.getId());
     }
 
@@ -81,8 +85,11 @@ public class FilmDao implements FilmStorage {
         if (keyHolder.getKey() == null) {
             throw new RuntimeException("Error getting the new film id");
         }
+        final int filmId = keyHolder.getKey().intValue();
 
-        return newObject.toBuilder().id(keyHolder.getKey().intValue()).likesCount(0).build();
+        genreStorage.setFilmGenres(filmId, newObject.getGenres());
+
+        return getById(filmId);
     }
 
     @Override
@@ -131,6 +138,8 @@ public class FilmDao implements FilmStorage {
 
                 // TODO: think about mpa_id can be null in db
                 .mpa(mpaStorage.getById(resultSet.getInt("mpa_id")))
+                .genres(genreStorage.getFilmGenres(resultSet.getInt("id")))
+
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
                 .likesCount(resultSet.getInt("likes_count"))

@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Value;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Collection;
 
 @Value
 @Builder(toBuilder = true)
@@ -17,5 +17,5 @@ public class Film {
     Integer likesCount;
 
     Mpa mpa;
-    List<Genre> genres;
+    Collection<Genre> genres;
 }
