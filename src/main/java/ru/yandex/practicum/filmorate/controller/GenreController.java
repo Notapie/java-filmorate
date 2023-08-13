@@ -13,7 +13,7 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/genres")
 public class GenreController {
-    private GenreService service;
+    private final GenreService service;
 
     @PostMapping
     public Genre create(@RequestBody final Genre newGenre) {

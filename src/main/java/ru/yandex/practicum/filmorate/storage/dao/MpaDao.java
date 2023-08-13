@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class MpaDao implements MpaStorage {
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Mpa update(Mpa newObject) {

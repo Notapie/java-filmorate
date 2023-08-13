@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class GenreDao implements GenreStorage {
-    private JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Genre update(Genre newObject) {

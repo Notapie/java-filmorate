@@ -11,7 +11,7 @@ import java.util.Collection;
 @Service
 @RequiredArgsConstructor
 public class GenreService {
-    private GenreStorage storage;
+    private final GenreStorage storage;
 
     // TODO: add logs and validation
     public Genre createNewGenre(final Genre newObject) {
