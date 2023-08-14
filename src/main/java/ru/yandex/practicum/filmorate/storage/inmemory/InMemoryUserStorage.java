@@ -139,6 +139,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public boolean existsById(final int id) {
+        return getById(id) != null;
+    }
+
+    @Override
     public Collection<User> getAll() {
         return idToUser.values();
     }

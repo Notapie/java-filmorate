@@ -81,6 +81,11 @@ public class GenreDao implements GenreStorage {
     }
 
     @Override
+    public boolean existsById(final int id) {
+        return getById(id) != null;
+    }
+
+    @Override
     public void setFilmGenres(final int filmId, final Collection<Genre> genres) {
         final String sql = "DELETE FROM \"film_genre\" WHERE film_id = ?";
         jdbcTemplate.update(sql, filmId);

@@ -137,6 +137,11 @@ public class FilmDao implements FilmStorage {
         return result.isEmpty() ? null : result.get(0);
     }
 
+    @Override
+    public boolean existsById(final int id) {
+        return getById(id) != null;
+    }
+
     private Film makeFilm(final ResultSet resultSet) throws SQLException {
         return Film.builder()
                 .id(resultSet.getInt("id"))

@@ -111,6 +111,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public boolean existsById(final int id) {
+        return getById(id) != null;
+    }
+
+    @Override
     public Collection<Film> getFilmsSortedByLikes(final int limit) {
         final Collection<Film> result = new ArrayList<>();
         Iterator<Film> it = orderedByLikesFilms.iterator();

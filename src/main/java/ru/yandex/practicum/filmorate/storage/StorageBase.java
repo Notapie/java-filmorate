@@ -12,4 +12,6 @@ public interface StorageBase<T> {
     Collection<T> getAll();
 
     T getById(int id);
+
+    boolean existsById(int id);
 }

@@ -151,6 +151,11 @@ public class UserDao implements UserStorage {
         return jdbcTemplate.query(sql, (rs, rn) -> makeUser(rs), firstUserId, secondUserId);
     }
 
+    @Override
+    public boolean existsById(final int id) {
+        return getById(id) != null;
+    }
+
     private User makeUser(final ResultSet resultSet) throws SQLException {
         return User.builder()
                 .id(resultSet.getInt("id"))

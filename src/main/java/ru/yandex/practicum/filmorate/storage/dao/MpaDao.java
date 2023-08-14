@@ -81,6 +81,11 @@ public class MpaDao implements MpaStorage {
         return result.isEmpty() ? null : result.get(0);
     }
 
+    @Override
+    public boolean existsById(final int id) {
+        return getById(id) != null;
+    }
+
     private Mpa makeMpa(final ResultSet resultSet) throws SQLException {
         return Mpa.builder()
                 .id(resultSet.getInt("id"))
