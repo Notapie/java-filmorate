@@ -18,8 +18,8 @@ public class MpaService {
     private final MpaStorage storage;
 
     public MpaService(MpaStorage storage, @Value("${max.mpa.name.length}") int maxNameLength) {
+        this.MAX_NAME_LENGTH = maxNameLength;
         this.storage = storage;
-        MAX_NAME_LENGTH = maxNameLength;
     }
 
     public Mpa createNewMpa(final Mpa newObject) {
