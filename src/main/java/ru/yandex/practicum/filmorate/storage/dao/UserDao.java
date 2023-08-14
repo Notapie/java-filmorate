@@ -26,7 +26,6 @@ import java.util.List;
 public class UserDao implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    // TODO: add exceptions and handlers for them
     @Override
     public User update(final User newObject) {
         final String sql = "UPDATE \"user\" " +

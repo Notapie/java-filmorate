@@ -85,7 +85,9 @@ public class UserService {
     }
 
     private void validate(final User user) {
-        // TODO: add email validation
+        if (user.getEmail() == null || !EmailValidator.validate(user.getEmail())) {
+            throw new ValidationException("Invalid email address");
+        }
 
         if (!StringUtils.hasText(user.getLogin())) {
             throw new ValidationException("User login must be not null or blank");
