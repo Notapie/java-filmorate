@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -13,9 +13,14 @@ import java.util.Collection;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class MpaService {
+    private final int MAX_NAME_LENGTH;
     private final MpaStorage storage;
+
+    public MpaService(MpaStorage storage, @Value("${max.mpa.name.length}") int maxNameLength) {
+        this.storage = storage;
+        MAX_NAME_LENGTH = maxNameLength;
+    }
 
     public Mpa createNewMpa(final Mpa newObject) {
         validate(newObject);
@@ -50,13 +55,11 @@ public class MpaService {
     }
 
     private void validate(final Mpa mpa) {
-        final int maxNameLength = 16;
-
         if (!StringUtils.hasText(mpa.getName())) {
             throw  new ValidationException("MPA name cannot be blank or null");
         }
-        if (mpa.getName().length() > maxNameLength) {
-            throw new ValidationException("The length of the MPA name exceeds " + maxNameLength + " characters");
+        if (mpa.getName().length() > MAX_NAME_LENGTH) {
+            throw new ValidationException("The length of the MPA name exceeds " + MAX_NAME_LENGTH + " characters");
         }
     }
 }

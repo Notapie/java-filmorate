@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -13,9 +13,14 @@ import java.util.Collection;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class GenreService {
+    private final int MAX_NAME_LENGTH;
     private final GenreStorage storage;
+
+    public GenreService(GenreStorage storage, @Value("${max.genre.name.length}") int maxNameLength) {
+        this.MAX_NAME_LENGTH = maxNameLength;
+        this.storage = storage;
+    }
 
     public Genre createNewGenre(final Genre newObject) {
         validate(newObject);
@@ -50,13 +55,11 @@ public class GenreService {
     }
 
     private void validate(final Genre genre) {
-        final int maxNameLength = 32;
-
         if (!StringUtils.hasText(genre.getName())) {
             throw  new ValidationException("Genre name cannot be blank or null");
         }
-        if (genre.getName().length() > maxNameLength) {
-            throw new ValidationException("The length of the genre name exceeds " + maxNameLength + " characters");
+        if (genre.getName().length() > MAX_NAME_LENGTH) {
+            throw new ValidationException("The length of the genre name exceeds " + MAX_NAME_LENGTH + " characters");
         }
     }
 }
