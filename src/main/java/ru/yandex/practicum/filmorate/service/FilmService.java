@@ -48,10 +48,10 @@ public class FilmService {
     }
 
     public void addLike(final int userId, final int filmId) {
-        if (userStorage.existsById(userId)) {
+        if (!userStorage.existsById(userId)) {
             throw new NotFoundException("User with id " + userId + " not found");
         }
-        if (filmStorage.existsById(filmId)) {
+        if (!filmStorage.existsById(filmId)) {
             throw new NotFoundException("Film with id " + filmId + " not found");
         }
         filmStorage.addLike(userId, filmId);
