@@ -3,11 +3,14 @@ package ru.yandex.practicum.filmorate.storage.dao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.SaveDataException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -30,13 +33,17 @@ public class UserDao implements UserStorage {
         final String sql = "UPDATE \"user\" " +
                 "SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
 
-        boolean isUpdated = jdbcTemplate.update(sql,
-                newObject.getEmail(), newObject.getLogin(),
-                newObject.getName(), newObject.getBirthday(),
-                newObject.getId()) > 0;
+        try {
+            boolean isUpdated = jdbcTemplate.update(sql,
+                    newObject.getEmail(), newObject.getLogin(),
+                    newObject.getName(), newObject.getBirthday(),
+                    newObject.getId()) > 0;
 
-        if (!isUpdated) {
-            throw new NotFoundException("User with id " + newObject.getId() + " is not found");
+            if (!isUpdated) {
+                throw new NotFoundException("User with id " + newObject.getId() + " is not found");
+            }
+        } catch (DuplicateKeyException e) {
+            throw new SaveDataException("Email or login duplicate", e);
         }
 
         return getById(newObject.getId());
@@ -48,14 +55,18 @@ public class UserDao implements UserStorage {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, newObject.getEmail());
-            ps.setString(2, newObject.getLogin());
-            ps.setString(3, newObject.getName());
-            ps.setString(4, newObject.getBirthday().toString());
-            return ps;
-        }, keyHolder);
+        try {
+            jdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, newObject.getEmail());
+                ps.setString(2, newObject.getLogin());
+                ps.setString(3, newObject.getName());
+                ps.setString(4, newObject.getBirthday().toString());
+                return ps;
+            }, keyHolder);
+        } catch (DuplicateKeyException e) {
+            throw new SaveDataException("Email or login duplicate", e);
+        }
 
         if (keyHolder.getKey() == null) {
             throw new RuntimeException("Error getting the new user id");
@@ -69,7 +80,11 @@ public class UserDao implements UserStorage {
         final User userToRemove = getById(id);
 
         final String sql = "DELETE FROM \"user\" WHERE id = ?";
-        jdbcTemplate.update(sql, id);
+        final boolean isDeleted = jdbcTemplate.update(sql, id) > 0;
+
+        if (!isDeleted) {
+            throw new NotFoundException("User with id " + id + " is not found");
+        }
 
         return userToRemove;
     }
@@ -85,11 +100,7 @@ public class UserDao implements UserStorage {
         final String sql = "SELECT * FROM \"user\" WHERE id = ?";
         List<User> result = jdbcTemplate.query(sql, (rs, rn) -> makeUser(rs), id);
 
-        if (result.isEmpty()) {
-            throw new NotFoundException("User with id " + id + " is not found");
-        }
-
-        return result.get(0);
+        return result.isEmpty() ? null : result.get(0);
     }
 
     @Override
@@ -97,22 +108,17 @@ public class UserDao implements UserStorage {
         final String sql = "SELECT * FROM \"user\" WHERE email = ?";
         List<User> result = jdbcTemplate.query(sql, (rs, rn) -> makeUser(rs), email);
 
-        if (result.isEmpty()) {
-            throw new NotFoundException("User with email " + email + " is not found");
-        }
-
-        return result.get(0);
+        return result.isEmpty() ? null : result.get(0);
     }
 
     @Override
     public void linkAsFriends(final int firstUserId, final int secondUserId) {
-        final String sql = "INSERT INTO \"user_friend\" " +
-                "(user_id, friend_id, is_accepted) VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO \"user_friend\" (user_id, friend_id) VALUES (?, ?)";
 
         try {
-            jdbcTemplate.update(sql, firstUserId, secondUserId, false);
-        } catch (DataAccessException e) {
-            throw new NotFoundException("invalid friend or user id");
+            jdbcTemplate.update(sql, firstUserId, secondUserId);
+        } catch (DataIntegrityViolationException e) {
+            throw new NotFoundException("Invalid friend or user id");
         }
     }
 

@@ -6,6 +6,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.SaveDataException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
@@ -46,7 +47,7 @@ public class GenreDao implements GenreStorage {
         }, keyHolder);
 
         if (keyHolder.getKey() == null) {
-            throw new RuntimeException("Error getting the new genre id");
+            throw new SaveDataException("Error getting the new genre id");
         }
 
         return newObject.toBuilder().id(keyHolder.getKey().intValue()).build();
@@ -57,7 +58,10 @@ public class GenreDao implements GenreStorage {
         final Genre genreToRemove = getById(id);
 
         final String sql = "DELETE FROM \"genre\" WHERE id = ?";
-        jdbcTemplate.update(sql, id);
+        final boolean isDeleted = jdbcTemplate.update(sql, id) > 0;
+        if (!isDeleted) {
+            throw new NotFoundException("Genre with id " + id + " is not found");
+        }
 
         return genreToRemove;
     }
@@ -73,11 +77,7 @@ public class GenreDao implements GenreStorage {
         final String sql = "SELECT * FROM \"genre\" WHERE id = ?";
         List<Genre> result = jdbcTemplate.query(sql, (rs, rn) -> makeGenre(rs), id);
 
-        if (result.isEmpty()) {
-            throw new NotFoundException("Genre with id " + id + " is not found");
-        }
-
-        return result.get(0);
+        return result.isEmpty() ? null : result.get(0);
     }
 
     @Override
@@ -94,8 +94,8 @@ public class GenreDao implements GenreStorage {
             uniqGenreIds.add(genre.getId());
         }
 
-        StringBuilder addGenresSql = new StringBuilder("INSERT INTO \"film_genre\" (film_id, genre_id) VALUES ");
-        List<Integer> params = new ArrayList<>();
+        final StringBuilder addGenresSql = new StringBuilder("INSERT INTO \"film_genre\" (film_id, genre_id) VALUES ");
+        final List<Integer> params = new ArrayList<>();
 
         int isFirst = 0;
         for (final int genre : uniqGenreIds) {

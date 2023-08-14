@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -135,10 +134,7 @@ public class FilmDao implements FilmStorage {
         final String sql = "SELECT * FROM \"film\" WHERE id = ?";
         final List<Film> result = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), id);
 
-        if (result.isEmpty()) {
-            throw new NotFoundException("Film with id " + id + " not found");
-        }
-        return result.get(0);
+        return result.isEmpty() ? null : result.get(0);
     }
 
     private Film makeFilm(final ResultSet resultSet) throws SQLException {

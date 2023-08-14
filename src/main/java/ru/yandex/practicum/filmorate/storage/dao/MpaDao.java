@@ -58,7 +58,11 @@ public class MpaDao implements MpaStorage {
         final Mpa mpaToRemove = getById(id);
 
         final String sql = "DELETE FROM \"mpa\" WHERE id = ?";
-        jdbcTemplate.update(sql, id);
+        final boolean isDeleted = jdbcTemplate.update(sql, id) > 0;
+
+        if (!isDeleted) {
+            throw new NotFoundException("Mpa with id " + id + " is not found");
+        }
 
         return mpaToRemove;
     }
@@ -74,11 +78,7 @@ public class MpaDao implements MpaStorage {
         final String sql = "SELECT * FROM \"mpa\" WHERE id = ?";
         List<Mpa> result = jdbcTemplate.query(sql, (rs, rn) -> makeMpa(rs), id);
 
-        if (result.isEmpty()) {
-            throw new NotFoundException("Mpa with id " + id + " is not found");
-        }
-
-        return result.get(0);
+        return result.isEmpty() ? null : result.get(0);
     }
 
     private Mpa makeMpa(final ResultSet resultSet) throws SQLException {

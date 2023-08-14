@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -24,7 +25,11 @@ public class UserService {
 
     public User getUser(final int id) {
         log.debug("Getting user by id " + id);
-        return userStorage.getById(id);
+        final User user = userStorage.getById(id);
+        if (user == null) {
+            throw new NotFoundException("User with id " + id + " is not found");
+        }
+        return user;
     }
 
     public Collection<User> getUserFriends(final int userId) {

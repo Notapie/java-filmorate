@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
@@ -41,7 +42,11 @@ public class MpaService {
 
     public Mpa getMpaById(final int id) {
         log.debug("Getting MPA by id " + id);
-        return storage.getById(id);
+        final Mpa mpa = storage.getById(id);
+        if (mpa == null) {
+            throw new NotFoundException("MPA with id " + id + " not found");
+        }
+        return mpa;
     }
 
     private void validate(final Mpa mpa) {
