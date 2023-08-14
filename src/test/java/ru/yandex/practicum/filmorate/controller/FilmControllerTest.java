@@ -173,7 +173,7 @@ class FilmControllerTest {
                         .build()
         ));
 
-        assertEquals("film name must be not null or blank", e.getMessage());
+        assertEquals("Film title must be not null or blank", e.getMessage());
     }
 
     @Test
@@ -187,7 +187,7 @@ class FilmControllerTest {
                         .build()
         ));
 
-        assertEquals("film desc must be less than 200", e.getMessage());
+        assertEquals("Film desc must be less than 200", e.getMessage());
     }
 
     @Test
