@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,15 +17,15 @@ import java.util.Collection;
 @Service
 public class FilmService {
     private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
-    private final int MAX_NAME_LENGTH;
+    private final int MAX_TITLE_LENGTH;
     private final int MAX_DESC_LENGTH;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
-    public FilmService(@Value("${max.film.name.length}") int maxNameLen,
+    public FilmService(@Value("${max.film.title.length}") int maxTitleLen,
                        @Value("${max.film.desc.length}") int maxDescLen,
                        FilmStorage filmStorage, UserStorage userStorage) {
-        this.MAX_NAME_LENGTH = maxNameLen;
+        this.MAX_TITLE_LENGTH = maxTitleLen;
         this.MAX_DESC_LENGTH = maxDescLen;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
@@ -91,8 +90,8 @@ public class FilmService {
             throw new ValidationException("Film name must be not null or blank");
         }
 
-        if (film.getName().length() > MAX_NAME_LENGTH) {
-            throw new ValidationException("Film name must be less than " + MAX_NAME_LENGTH);
+        if (film.getName().length() > MAX_TITLE_LENGTH) {
+            throw new ValidationException("Film name must be less than " + MAX_TITLE_LENGTH);
         }
 
         if (film.getDescription() != null && film.getDescription().length() > MAX_DESC_LENGTH) {
