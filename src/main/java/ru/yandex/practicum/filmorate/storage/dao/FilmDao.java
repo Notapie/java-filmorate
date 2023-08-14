@@ -143,7 +143,6 @@ public class FilmDao implements FilmStorage {
                 .name(resultSet.getString("title"))
                 .description(resultSet.getString("description"))
 
-                // TODO: think about mpa_id can be null in db
                 .mpa(mpaStorage.getById(resultSet.getInt("mpa_id")))
                 .genres(genreStorage.getFilmGenres(resultSet.getInt("id")))
 
