@@ -1,11 +1,20 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import java.util.regex.Pattern;
 
+@Service
 public class EmailValidator {
-    public static boolean validate(final String email) {
-        final String regexPattern = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
-        return patternMatches(email, regexPattern);
+    private final String EMAIL_REGEX_PATTERN;
+
+    public EmailValidator(@Value("${email.regex}") final String emailRegex) {
+        this.EMAIL_REGEX_PATTERN = emailRegex;
+    }
+
+    public boolean validate(final String email) {
+        return patternMatches(email, EMAIL_REGEX_PATTERN);
     }
 
     public static boolean patternMatches(final String emailAddress, final String regexPattern) {

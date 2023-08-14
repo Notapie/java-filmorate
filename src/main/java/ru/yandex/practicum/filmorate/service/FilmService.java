@@ -87,11 +87,11 @@ public class FilmService {
 
     private void validate(final Film film) {
         if (!StringUtils.hasText(film.getName())) {
-            throw new ValidationException("Film name must be not null or blank");
+            throw new ValidationException("Film title must be not null or blank");
         }
 
         if (film.getName().length() > MAX_TITLE_LENGTH) {
-            throw new ValidationException("Film name must be less than " + MAX_TITLE_LENGTH);
+            throw new ValidationException("Film title must be less than " + MAX_TITLE_LENGTH);
         }
 
         if (film.getDescription() != null && film.getDescription().length() > MAX_DESC_LENGTH) {
