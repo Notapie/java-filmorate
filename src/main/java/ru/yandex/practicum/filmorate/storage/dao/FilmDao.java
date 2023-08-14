@@ -2,11 +2,15 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.SaveDataException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
@@ -27,12 +31,18 @@ public class FilmDao implements FilmStorage {
     private final MpaStorage mpaStorage;
     private final GenreStorage genreStorage;
 
-    // TODO: add exceptions and handlers for them
     @Override
     public void addLike(int userId, int filmId) {
-        final String sql = "INSERT INTO \"user_favorite\" (user_id, film_id) VALUES (?, ?); " +
-            "UPDATE \"film\" SET likes_count = likes_count + 1 WHERE id = ?";
-        jdbcTemplate.update(sql, userId, filmId, filmId);
+        final String insertSql = "INSERT INTO \"user_favorite\" (user_id, film_id) VALUES (?, ?)";
+
+        try {
+            jdbcTemplate.update(insertSql, userId, filmId);
+        } catch (DuplicateKeyException e) {
+            throw new AlreadyExistsException("This movie is already in the user's favorites list");
+        }
+
+        final String updateSql = "UPDATE \"film\" SET likes_count = likes_count + 1 WHERE id = ?";
+        jdbcTemplate.update(updateSql, filmId);
     }
 
     @Override
@@ -43,6 +53,8 @@ public class FilmDao implements FilmStorage {
         if (isRemoved) {
             final String decrementSql = "UPDATE \"film\" SET likes_count = likes_count - 1 WHERE id = ?";
             jdbcTemplate.update(decrementSql, filmId);
+        } else {
+            throw new NotFoundException("The movie " + filmId + " is not in the user's " + userId + " favorites list");
         }
     }
 
@@ -83,7 +95,7 @@ public class FilmDao implements FilmStorage {
         }, keyHolder);
 
         if (keyHolder.getKey() == null) {
-            throw new RuntimeException("Error getting the new film id");
+            throw new SaveDataException("Error getting the new film id");
         }
         final int filmId = keyHolder.getKey().intValue();
 
@@ -97,18 +109,18 @@ public class FilmDao implements FilmStorage {
         final Film filmToRemove = getById(id);
 
         final String sql = "DELETE FROM \"film\" WHERE id = ?";
-        jdbcTemplate.update(sql, id);
+        boolean isRemoved = jdbcTemplate.update(sql, id) > 0;
+
+        if (!isRemoved) {
+            throw new NotFoundException("Film with id " + id + " is not found");
+        }
 
         return filmToRemove;
     }
 
     @Override
     public Collection<Film> getFilmsSortedByLikes(final int limit) {
-        final String sql = "SELECT * " +
-                "FROM \"film\" " +
-                "ORDER BY likes_count DESC " +
-                "LIMIT ?";
-
+        final String sql = "SELECT * FROM \"film\" ORDER BY likes_count DESC LIMIT ?";
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), limit);
     }
 
@@ -121,7 +133,6 @@ public class FilmDao implements FilmStorage {
     @Override
     public Film getById(int id) {
         final String sql = "SELECT * FROM \"film\" WHERE id = ?";
-
         final List<Film> result = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), id);
 
         if (result.isEmpty()) {

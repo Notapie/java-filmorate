@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.SaveDataException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
@@ -16,6 +17,7 @@ public class ErrorController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse notFound(final NotFoundException e) {
+        log.debug(e.getMessage());
         return new ErrorResponse(
           "Not found", e.getMessage()
         );
@@ -24,6 +26,7 @@ public class ErrorController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse alreadyExists(final AlreadyExistsException e) {
+        log.debug(e.getMessage());
         return new ErrorResponse(
                 "Already exists", e.getMessage()
         );
@@ -32,6 +35,7 @@ public class ErrorController {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse validationError(final ValidationException e) {
+        log.debug(e.getMessage());
         return new ErrorResponse(
                 "Validation error", e.getMessage()
         );
@@ -39,10 +43,10 @@ public class ErrorController {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse unknownError(final Exception e) {
-        log.error(e.getMessage() == null ? "Something went wrong" : e.getMessage());
+    public ErrorResponse saveError(final SaveDataException e) {
+        log.debug(e.getMessage());
         return new ErrorResponse(
-                "Internal server error", null
+                "Save data error", e.getMessage()
         );
     }
 }

@@ -40,6 +40,9 @@ public class FilmService {
         if (userStorage.getById(userId) == null) {
             throw new NotFoundException("User with id " + userId + " not found");
         }
+        if (filmStorage.getById(filmId) == null) {
+            throw new NotFoundException("Film with id " + filmId + " not found");
+        }
         filmStorage.addLike(userId, filmId);
     }
 
