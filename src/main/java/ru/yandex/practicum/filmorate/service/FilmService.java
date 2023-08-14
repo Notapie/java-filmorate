@@ -69,7 +69,7 @@ public class FilmService {
         validate(film);
 
         final Film newFilm = filmStorage.update(film);
-        log.debug("Updated film: " + film);
+        log.debug("Updated film: " + newFilm);
 
         return newFilm;
     }
