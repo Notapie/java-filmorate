@@ -15,16 +15,16 @@ import java.util.Collection;
 @Slf4j
 @Service
 public class UserService {
-    private final int MAX_NAME_LENGTH;
-    private final int MAX_LOGIN_LENGTH;
+    private final int maxNameLength;
+    private final int maxLoginLength;
     private final UserStorage userStorage;
     private final EmailValidator emailValidator;
 
     public UserService(@Value("${max.user.name.length}") final int maxNameLength,
                        @Value("${max.user.login.length}") final int maxLoginLength,
                        EmailValidator emailValidator, UserStorage userStorage) {
-        this.MAX_NAME_LENGTH = maxNameLength;
-        this.MAX_LOGIN_LENGTH = maxLoginLength;
+        this.maxNameLength = maxNameLength;
+        this.maxLoginLength = maxLoginLength;
         this.userStorage = userStorage;
         this.emailValidator = emailValidator;
     }
@@ -100,16 +100,16 @@ public class UserService {
             throw new ValidationException("Invalid email address");
         }
 
-        if (user.getName() != null && user.getName().length() > MAX_NAME_LENGTH) {
-            throw new ValidationException("User name length must be less than " + MAX_NAME_LENGTH);
+        if (user.getName() != null && user.getName().length() > maxNameLength) {
+            throw new ValidationException("User name length must be less than " + maxNameLength);
         }
 
         if (!StringUtils.hasText(user.getLogin())) {
             throw new ValidationException("User login must be not null or blank");
         }
 
-        if (user.getLogin().length() > MAX_LOGIN_LENGTH) {
-            throw new ValidationException("User login length must be less than " + MAX_LOGIN_LENGTH);
+        if (user.getLogin().length() > maxLoginLength) {
+            throw new ValidationException("User login length must be less than " + maxLoginLength);
         }
 
         if (user.getLogin().contains(" ")) {

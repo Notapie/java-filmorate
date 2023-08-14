@@ -14,11 +14,11 @@ import java.util.Collection;
 @Slf4j
 @Service
 public class GenreService {
-    private final int MAX_NAME_LENGTH;
+    private final int maxNameLength;
     private final GenreStorage storage;
 
     public GenreService(GenreStorage storage, @Value("${max.genre.name.length}") int maxNameLength) {
-        this.MAX_NAME_LENGTH = maxNameLength;
+        this.maxNameLength = maxNameLength;
         this.storage = storage;
     }
 
@@ -58,8 +58,8 @@ public class GenreService {
         if (!StringUtils.hasText(genre.getName())) {
             throw  new ValidationException("Genre name cannot be blank or null");
         }
-        if (genre.getName().length() > MAX_NAME_LENGTH) {
-            throw new ValidationException("The length of the genre name exceeds " + MAX_NAME_LENGTH + " characters");
+        if (genre.getName().length() > maxNameLength) {
+            throw new ValidationException("The length of the genre name exceeds " + maxNameLength + " characters");
         }
     }
 }

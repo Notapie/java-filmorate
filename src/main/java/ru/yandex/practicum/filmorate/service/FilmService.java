@@ -17,16 +17,16 @@ import java.util.Collection;
 @Service
 public class FilmService {
     private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
-    private final int MAX_TITLE_LENGTH;
-    private final int MAX_DESC_LENGTH;
+    private final int maxTitleLength;
+    private final int maxDescLength;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
     public FilmService(@Value("${max.film.title.length}") int maxTitleLen,
                        @Value("${max.film.desc.length}") int maxDescLen,
                        FilmStorage filmStorage, UserStorage userStorage) {
-        this.MAX_TITLE_LENGTH = maxTitleLen;
-        this.MAX_DESC_LENGTH = maxDescLen;
+        this.maxTitleLength = maxTitleLen;
+        this.maxDescLength = maxDescLen;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }
@@ -90,12 +90,12 @@ public class FilmService {
             throw new ValidationException("Film title must be not null or blank");
         }
 
-        if (film.getName().length() > MAX_TITLE_LENGTH) {
-            throw new ValidationException("Film title must be less than " + MAX_TITLE_LENGTH);
+        if (film.getName().length() > maxTitleLength) {
+            throw new ValidationException("Film title must be less than " + maxTitleLength);
         }
 
-        if (film.getDescription() != null && film.getDescription().length() > MAX_DESC_LENGTH) {
-            throw new ValidationException("Film desc must be less than " + MAX_DESC_LENGTH);
+        if (film.getDescription() != null && film.getDescription().length() > maxDescLength) {
+            throw new ValidationException("Film desc must be less than " + maxDescLength);
         }
 
         if (film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {

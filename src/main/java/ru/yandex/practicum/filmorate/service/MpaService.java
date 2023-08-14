@@ -14,11 +14,11 @@ import java.util.Collection;
 @Slf4j
 @Service
 public class MpaService {
-    private final int MAX_NAME_LENGTH;
+    private final int maxNameLength;
     private final MpaStorage storage;
 
     public MpaService(MpaStorage storage, @Value("${max.mpa.name.length}") int maxNameLength) {
-        this.MAX_NAME_LENGTH = maxNameLength;
+        this.maxNameLength = maxNameLength;
         this.storage = storage;
     }
 
@@ -58,8 +58,8 @@ public class MpaService {
         if (!StringUtils.hasText(mpa.getName())) {
             throw  new ValidationException("MPA name cannot be blank or null");
         }
-        if (mpa.getName().length() > MAX_NAME_LENGTH) {
-            throw new ValidationException("The length of the MPA name exceeds " + MAX_NAME_LENGTH + " characters");
+        if (mpa.getName().length() > maxNameLength) {
+            throw new ValidationException("The length of the MPA name exceeds " + maxNameLength + " characters");
         }
     }
 }
