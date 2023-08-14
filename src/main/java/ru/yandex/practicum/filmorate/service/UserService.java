@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -19,22 +18,22 @@ public class UserService {
     private final UserStorage userStorage;
 
     public Collection<User> getAll() {
+        log.debug("Getting all users");
         return userStorage.getAll();
     }
 
     public User getUser(final int id) {
-        final User result = userStorage.getById(id);
-        if (result == null) {
-            throw new NotFoundException("User with id " + id + " not found");
-        }
-        return result;
+        log.debug("Getting user by id " + id);
+        return userStorage.getById(id);
     }
 
     public Collection<User> getUserFriends(final int userId) {
+        log.debug("Getting user " + userId + " friends");
         return userStorage.getUserFriends(userId);
     }
 
     public Collection<User> getUsersCommonFriends(final int userId, final int otherId) {
+        log.debug("Getting users " + userId + " and " + otherId + " common friends");
         return userStorage.getMutualFriends(userId, otherId);
     }
 
@@ -71,10 +70,12 @@ public class UserService {
     }
 
     public void linkFriends(final int userId, final int otherId) {
+        log.debug("Sending the friendship request from " + userId + " to " + otherId);
         userStorage.linkAsFriends(userId, otherId);
     }
 
     public void unlinkFriends(final int userId, final int otherId) {
+        log.debug("Canceling the friendship request from " + userId + " to " + otherId);
         userStorage.unlinkFriends(userId, otherId);
     }
 
