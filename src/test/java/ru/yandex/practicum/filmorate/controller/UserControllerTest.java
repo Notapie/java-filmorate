@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.EmailValidator;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryUserStorage;
 
@@ -16,7 +17,9 @@ class UserControllerTest {
 
     @BeforeEach
     public void updateController() {
-        controller = new UserController(new UserService(new InMemoryUserStorage()));
+        controller = new UserController(new UserService(64, 64,
+                new EmailValidator("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$"),
+                new InMemoryUserStorage()));
     }
 
     @Test

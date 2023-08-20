@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.inmemory;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -24,7 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film createFilm(final Film film) {
+    public Film create(final Film film) {
         final Film createdFilm = film.toBuilder()
                 .id(idGenerator++)
                 .likesCount(0)
@@ -37,7 +38,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(final Film film) {
+    public Film update(final Film film) {
         final Film oldRecord = idToFilm.get(film.getId());
 
         if (oldRecord == null) {
@@ -53,7 +54,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean addLike(final int userId, final int filmId) {
+    public void addLike(final int userId, final int filmId) {
         Film film = idToFilm.get(filmId);
 
         if (film == null) {
@@ -64,22 +65,20 @@ public class InMemoryFilmStorage implements FilmStorage {
         final Set<Integer> usersLiked = filmToUserLiked.computeIfAbsent(filmId, k -> new HashSet<>());
 
         if (likedFilms.contains(filmId)) {
-            return false;
+            throw new AlreadyExistsException("The movie id " + filmId + " is already in favorites");
         }
 
         likedFilms.add(filmId);
         usersLiked.add(userId);
         film = film.toBuilder().likesCount(film.getLikesCount() + 1).build();
-        updateFilm(film);
-
-        return true;
+        update(film);
     }
 
     @Override
-    public boolean removeLike(int userId, int filmId) {
+    public void removeLike(int userId, int filmId) {
         final Set<Integer> likedFilms = userIdToLikedFilmsIds.get(userId);
         if (likedFilms == null || !likedFilms.contains(filmId)) {
-            return false;
+            throw new NotFoundException("Film with id " + filmId + " not found in favorites");
         }
         likedFilms.remove(filmId);
 
@@ -90,14 +89,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film != null) {
             final int newLikesCount = Integer.max(film.getLikesCount() - 1, 0);
             film = film.toBuilder().likesCount(newLikesCount).build();
-            updateFilm(film);
+            update(film);
         }
-
-        return true;
     }
 
     @Override
-    public Film deleteFilm(final int filmId) {
+    public Film delete(final int filmId) {
         final Film oldRecord = idToFilm.remove(filmId);
 
         if (oldRecord == null) {
@@ -109,13 +106,24 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film getFilmById(final int filmId) {
+    public Film getById(final int filmId) {
         return idToFilm.get(filmId);
     }
 
     @Override
-    public Collection<Film> getFilmsSortedByLikes() {
-        return orderedByLikesFilms;
+    public boolean existsById(final int id) {
+        return getById(id) != null;
+    }
+
+    @Override
+    public Collection<Film> getFilmsSortedByLikes(final int limit) {
+        final Collection<Film> result = new ArrayList<>();
+        Iterator<Film> it = orderedByLikesFilms.iterator();
+        for (int i = 0; i < limit && it.hasNext(); i++) {
+            result.add(it.next());
+        }
+
+        return result;
     }
 
     @Override

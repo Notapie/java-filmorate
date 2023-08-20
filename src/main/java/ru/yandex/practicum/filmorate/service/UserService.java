@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -14,27 +14,42 @@ import java.util.Collection;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserService {
+    private final int maxNameLength;
+    private final int maxLoginLength;
     private final UserStorage userStorage;
+    private final EmailValidator emailValidator;
+
+    public UserService(@Value("${max.user.name.length}") final int maxNameLength,
+                       @Value("${max.user.login.length}") final int maxLoginLength,
+                       EmailValidator emailValidator, UserStorage userStorage) {
+        this.maxNameLength = maxNameLength;
+        this.maxLoginLength = maxLoginLength;
+        this.userStorage = userStorage;
+        this.emailValidator = emailValidator;
+    }
 
     public Collection<User> getAll() {
+        log.debug("Getting all users");
         return userStorage.getAll();
     }
 
     public User getUser(final int id) {
-        final User result = userStorage.getUserById(id);
-        if (result == null) {
-            throw new NotFoundException("User with id " + id + " not found");
+        log.debug("Getting user by id " + id);
+        final User user = userStorage.getById(id);
+        if (user == null) {
+            throw new NotFoundException("User with id " + id + " is not found");
         }
-        return result;
+        return user;
     }
 
     public Collection<User> getUserFriends(final int userId) {
+        log.debug("Getting user " + userId + " friends");
         return userStorage.getUserFriends(userId);
     }
 
     public Collection<User> getUsersCommonFriends(final int userId, final int otherId) {
+        log.debug("Getting users " + userId + " and " + otherId + " common friends");
         return userStorage.getMutualFriends(userId, otherId);
     }
 
@@ -46,7 +61,7 @@ public class UserService {
             builder.name(user.getLogin());
         }
 
-        final User newUser = userStorage.createUser(builder.build());
+        final User newUser = userStorage.create(builder.build());
         log.debug("Added new user: " + newUser);
 
         return newUser;
@@ -64,23 +79,37 @@ public class UserService {
             builder.name(user.getLogin());
         }
 
-        final User newUser = userStorage.updateUser(builder.build());
+        final User newUser = userStorage.update(builder.build());
         log.debug("Updated user: " + newUser);
 
         return newUser;
     }
 
     public void linkFriends(final int userId, final int otherId) {
+        log.debug("Sending the friendship request from " + userId + " to " + otherId);
         userStorage.linkAsFriends(userId, otherId);
     }
 
     public void unlinkFriends(final int userId, final int otherId) {
+        log.debug("Canceling the friendship request from " + userId + " to " + otherId);
         userStorage.unlinkFriends(userId, otherId);
     }
 
     private void validate(final User user) {
+        if (user.getEmail() == null || !emailValidator.validate(user.getEmail())) {
+            throw new ValidationException("Invalid email address");
+        }
+
+        if (user.getName() != null && user.getName().length() > maxNameLength) {
+            throw new ValidationException("User name length must be less than " + maxNameLength);
+        }
+
         if (!StringUtils.hasText(user.getLogin())) {
             throw new ValidationException("User login must be not null or blank");
+        }
+
+        if (user.getLogin().length() > maxLoginLength) {
+            throw new ValidationException("User login length must be less than " + maxLoginLength);
         }
 
         if (user.getLogin().contains(" ")) {

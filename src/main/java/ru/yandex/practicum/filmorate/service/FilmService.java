@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -11,50 +11,54 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class FilmService {
+    private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+    private final int maxTitleLength;
+    private final int maxDescLength;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+
+    public FilmService(@Value("${max.film.title.length}") int maxTitleLen,
+                       @Value("${max.film.desc.length}") int maxDescLen,
+                       FilmStorage filmStorage, UserStorage userStorage) {
+        this.maxTitleLength = maxTitleLen;
+        this.maxDescLength = maxDescLen;
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+    }
 
     public Collection<Film> getAll() {
         return filmStorage.getAll();
     }
 
     public Film getFilm(final int id) {
-        final Film result = filmStorage.getFilmById(id);
+        final Film result = filmStorage.getById(id);
         if (result == null) {
             throw new NotFoundException("Film with id " + id + " not found");
         }
         return result;
     }
 
-    public Collection<Film> getPopular(final int count) {
-        final Collection<Film> sortedFilms = filmStorage.getFilmsSortedByLikes();
-
-        final Collection<Film> result = new ArrayList<>();
-        Iterator<Film> it = sortedFilms.iterator();
-        for (int i = 0; i < count && it.hasNext(); i++) {
-            result.add(it.next());
-        }
-
-        return result;
+    public Collection<Film> getPopular(final int limit) {
+        return filmStorage.getFilmsSortedByLikes(limit);
     }
 
     public void addLike(final int userId, final int filmId) {
-        if (userStorage.getUserById(userId) == null) {
+        if (!userStorage.existsById(userId)) {
             throw new NotFoundException("User with id " + userId + " not found");
+        }
+        if (!filmStorage.existsById(filmId)) {
+            throw new NotFoundException("Film with id " + filmId + " not found");
         }
         filmStorage.addLike(userId, filmId);
     }
 
     public void removeLike(final int userId, final int filmId) {
-        if (userStorage.getUserById(userId) == null) {
+        if (userStorage.getById(userId) == null) {
             throw new NotFoundException("User with id " + userId + " not found");
         }
         filmStorage.removeLike(userId, filmId);
@@ -63,7 +67,7 @@ public class FilmService {
     public Film create(final Film film) {
         validate(film);
 
-        final Film newFilm = filmStorage.createFilm(film);
+        final Film newFilm = filmStorage.create(film);
         log.debug("Added new film: " + newFilm);
 
         return newFilm;
@@ -75,22 +79,26 @@ public class FilmService {
         }
         validate(film);
 
-        final Film newFilm = filmStorage.updateFilm(film);
-        log.debug("Updated film: " + film);
+        final Film newFilm = filmStorage.update(film);
+        log.debug("Updated film: " + newFilm);
 
         return newFilm;
     }
 
     private void validate(final Film film) {
         if (!StringUtils.hasText(film.getName())) {
-            throw new ValidationException("film name must be not null or blank");
+            throw new ValidationException("Film title must be not null or blank");
         }
 
-        if (film.getDescription() != null && film.getDescription().length() > 200) {
-            throw new ValidationException("film desc must be less than 200");
+        if (film.getName().length() > maxTitleLength) {
+            throw new ValidationException("Film title must be less than " + maxTitleLength);
         }
 
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+        if (film.getDescription() != null && film.getDescription().length() > maxDescLength) {
+            throw new ValidationException("Film desc must be less than " + maxDescLength);
+        }
+
+        if (film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
             throw new ValidationException("Invalid film release date");
         }
 

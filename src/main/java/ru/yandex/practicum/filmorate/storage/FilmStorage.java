@@ -4,20 +4,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 
-public interface FilmStorage {
-    Film createFilm(Film film);
+public interface FilmStorage extends StorageBase<Film> {
+    void addLike(int userId, int filmId);
 
-    Film updateFilm(Film film);
+    void removeLike(int userId, int filmId);
 
-    boolean addLike(int userId, int filmId);
-
-    boolean removeLike(int userId, int filmId);
-
-    Film deleteFilm(int filmId);
-
-    Film getFilmById(int filmId);
-
-    Collection<Film> getFilmsSortedByLikes();
-
-    Collection<Film> getAll();
+    Collection<Film> getFilmsSortedByLikes(int limit);
 }

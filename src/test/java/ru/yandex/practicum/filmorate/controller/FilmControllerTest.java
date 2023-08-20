@@ -43,7 +43,8 @@ class FilmControllerTest {
 
     @BeforeEach
     public void updateController() {
-        controller = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
+        controller = new FilmController(new FilmService(64, 200,
+                new InMemoryFilmStorage(), new InMemoryUserStorage()));
     }
 
     @Test
@@ -172,7 +173,7 @@ class FilmControllerTest {
                         .build()
         ));
 
-        assertEquals("film name must be not null or blank", e.getMessage());
+        assertEquals("Film title must be not null or blank", e.getMessage());
     }
 
     @Test
@@ -186,7 +187,7 @@ class FilmControllerTest {
                         .build()
         ));
 
-        assertEquals("film desc must be less than 200", e.getMessage());
+        assertEquals("Film desc must be less than 200", e.getMessage());
     }
 
     @Test

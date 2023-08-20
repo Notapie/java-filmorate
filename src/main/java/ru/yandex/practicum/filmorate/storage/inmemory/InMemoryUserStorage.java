@@ -25,7 +25,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User createUser(final User user) {
+    public User create(final User user) {
         if (emailToUser.containsKey(user.getEmail())) {
             throw new AlreadyExistsException(String.format(
                     "User with email %s already exists", user.getEmail()
@@ -49,7 +49,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(final User user) {
+    public User update(final User user) {
         final User oldRecord = idToUser.get(user.getId());
 
         if (oldRecord == null) {
@@ -83,7 +83,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean linkAsFriends(final int firstUserId, final int secondUserId) {
+    public void linkAsFriends(final int firstUserId, final int secondUserId) {
         // check if users exists
         final Set<Integer> firstUserFriends = idToFriendsIds.get(firstUserId);
         final Set<Integer> secondUserFriends = idToFriendsIds.get(secondUserId);
@@ -98,11 +98,10 @@ public class InMemoryUserStorage implements UserStorage {
         // saving
         secondUserFriends.add(firstUserId);
         firstUserFriends.add(secondUserId);
-        return true;
     }
 
     @Override
-    public boolean unlinkFriends(final int firstUserId, final int secondUserId) {
+    public void unlinkFriends(final int firstUserId, final int secondUserId) {
         final Set<Integer> firstUserFriends = idToFriendsIds.get(firstUserId);
         final Set<Integer> secondUserFriends = idToFriendsIds.get(secondUserId);
 
@@ -112,12 +111,10 @@ public class InMemoryUserStorage implements UserStorage {
         if (secondUserFriends != null) {
             secondUserFriends.remove(firstUserId);
         }
-
-        return true;
     }
 
     @Override
-    public User removeUser(final int id) {
+    public User delete(final int id) {
         final User user = idToUser.remove(id);
 
         if (user == null) {
@@ -137,8 +134,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(final int id) {
+    public User getById(final int id) {
         return idToUser.get(id);
+    }
+
+    @Override
+    public boolean existsById(final int id) {
+        return getById(id) != null;
     }
 
     @Override
